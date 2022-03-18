@@ -1,0 +1,25 @@
+body {
+    font-family: 'Courier New', Courier, monospace;
+    background-color: rgb(78, 78, 78);
+    margin: 0;
+}
+
+h1 {
+    text-align: center;
+}
+
+/*Watizdatfing ?*/
+.about {
+    background-color: rgb(78, 78, 78);
+    border: 2px solid rgb(58, 58, 58);
+    border-radius: 20px;
+    width: 50em;
+    margin: 30px auto 0 auto;
+    padding: 20px;
+    transition: box-shadow 500ms, margin-top 500ms;
+}
+
+.about:hover {
+    box-shadow: 5px 5px 20px rgb(20, 20, 20);
+    margin-top: 25px;
+}

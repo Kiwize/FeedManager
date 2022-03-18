@@ -1,0 +1,43 @@
+body {
+    font-family: 'Courier New', Courier, monospace;
+    margin: 0;
+}
+
+h1 {
+    text-align: center;
+}
+
+/*Form*/
+
+form {
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+    justify-content: space-around;
+    width: 40%;
+    height: 50vh;
+}
+
+form > div {
+    display: flex;
+    flex-direction: column;
+}
+
+form > div > label {
+    text-align: center;
+}
+
+form > input {
+    margin: 0 auto;
+    background-color: rgb(40, 40, 40);
+}
+
+input {
+    background-color: rgb(40, 40, 40);
+    border: none;
+}
+
+#submit_button {
+    width: 80px;
+}
+

@@ -1,0 +1,86 @@
+body {
+    background-color: rgb(70, 70, 70);
+    scrollbar-width: 1px;
+}
+
+p,
+h1,
+h2,
+h3,
+a,
+a:visited,
+input,
+label,
+button {
+    color: white;
+}
+
+h1 {
+    text-align: center;
+    font-family: 'Courier New', Courier, monospace;
+    margin-top: 0;
+    padding: 10px;
+}
+
+header {
+    background-image: url("../banner.jpeg");
+    background-size: cover;
+}
+
+
+/* Navigation */
+
+nav {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    border-bottom: 2px solid black;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+nav>ul {
+    padding: 0 20px;
+}
+
+nav>ul:hover {
+    text-decoration: underline;
+    color: white;
+}
+
+a:visited {
+    text-decoration: none;
+    color: white;
+}
+
+nav>ul>a {
+    text-decoration: none;
+    color: white;
+}
+
+
+/* width */
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+
+/* Track */
+
+::-webkit-scrollbar-track {
+    background: rgb(0, 0, 0);
+}
+
+
+/* Handle */
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+}
+
+
+/* Handle on hover */
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}

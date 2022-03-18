@@ -1,0 +1,82 @@
+body {
+    font-family: 'Courier New', Courier, monospace;
+    margin: 0;
+}
+
+h1 {
+    text-align: center;
+}
+
+.parent {
+    display: flex;
+    flex-direction: row;
+}
+
+/*Feed view*/
+#feed_view {
+    width: fit-content;
+    height: 70vh;
+}
+
+#feed_view > h2 {
+    margin-left: 40px;
+    border-bottom: 2px solid black;
+}
+
+#feed_url_text {
+    margin-left: 40px;
+}
+
+/*Feed list*/
+#feed_list {
+    display: flex;
+    flex-flow: column;
+    padding-top: 30px;
+    width: 25vw;
+    max-width: 250px;
+    background-color: rgb(65, 65, 65);
+}
+
+.feedlink {
+    background: none;
+    border: none;
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.feedlink:hover {
+    background-color: rgb(73, 73, 73);
+}
+
+/*Buttons*/
+.add_button, .remove_button {
+    width: 80px;
+    height: 20px;
+}
+
+.buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    width: 25vw;
+    max-width: 250px;
+    background-color: rgb(65, 65, 65);
+    padding-bottom: 10px;
+    padding-top: 20px;
+}
+
+.add_button, .remove_button {
+    background: none;
+    border: none;
+    text-decoration: none;
+    font-size: 16px;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.add_button:visited {
+    text-decoration: none;
+}
+
+.remove_button:disabled {
+    color: gray;
+}
