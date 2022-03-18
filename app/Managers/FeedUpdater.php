@@ -15,13 +15,13 @@ class FeedUpdater
         $articlesBeforeUpdate = Article::count();
 
         $hashManager = new HashManager;
-        $allFeedsLinks = Feed::select(['link', 'id'])->get();
+        $allFeedsLinks = Feed::select(['link', 'id', 'articlesQuantity'])->get();
 
         $startTime = microtime(true);
 
         foreach ($allFeedsLinks as $feed) {
             $rssData = new RSSData($feed->link);
-            for ($i = 0; $i < $rssData->getArticleQuantity(); $i++) {
+            for ($i = 0; $i < $rssData->getArticleCount(); $i++) {
                 $rssArticle = $rssData
                     ->getArticle($i);
 
@@ -31,11 +31,7 @@ class FeedUpdater
                     );
 
                 /** @var \App\Models\Article|null $article */
-                $article = Article::where(
-                    'staticHash',
-                    '=',
-                    $feedHashedArticle['staticHash']
-                )->first();
+                $article = Article::where('staticHash', '=', $feedHashedArticle['staticHash'])->first();
 
                 // no article found: create it
                 if (true === is_null($article)) {
@@ -46,7 +42,7 @@ class FeedUpdater
                     );
 
                     $addedArticles++;
-
+                    $feed->fill(['articleQuantity' => ($feed->articleQuantity + 1)]);
                     continue;
                 }
 
@@ -68,23 +64,6 @@ class FeedUpdater
                     ->save();
 
                 $modifiedArticles++;
-
-                /*
-                if(Article::where('staticHash', '=', $hashManager->hashArticle($rssData->getArticle($i))['staticHash'])->count() == 0) {
-                    //Create new record in database.
-                    FeedUpdater::addArticle($rssData, $i, $feed->id);
-                } else {
-                    //Do multiple tests to see what changed in the article.
-                    if (Article::where('dynamicHash', '=', $hashManager->hashArticle($rssData->getArticle($i))['dynamicHash'])->count() == 0) {
-                        //Article has been changed. (title, description or link)
-                        Article::where('staticHash', '=', $hashManager->hashArticle($rssData->getArticle($i))['staticHash'])->delete();
-                        FeedUpdater::addArticle($rssData, $i, $feed->id);
-                        $modifiedArticles++;
-                    } else {
-                        $unchangedArticles++;
-                    }
-                }
-                */
             }
         }
 
@@ -101,7 +80,7 @@ class FeedUpdater
         );
     }
 
-    public static function addArticle(RSSData $rssData, int $id, int $feedID)
+    private static function addArticle(RSSData $rssData, int $id, int $feedID)
     {
         $newArticle = new Article;
         $newArticle->title = $rssData->getTitle($id);

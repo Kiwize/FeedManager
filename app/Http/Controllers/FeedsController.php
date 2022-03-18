@@ -2,14 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Managers\HashManager;
 use ErrorException;
 use App\Models\Feed;
 use App\Models\Article;
 use App\Managers\RSSData;
-use App\Models\FeedData;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class FeedsController extends Controller {
     public function getFeedList() {
@@ -45,7 +42,7 @@ class FeedsController extends Controller {
         $feed = new Feed;
         $feed->name = $request->name;
         $feed->link = $request->link;
-        $feed->articlesQuantity = $rssData->getArticleQuantity();
+        $feed->articlesQuantity = $rssData->getArticleCount();
         $feed->icon_link = $request->ilink;
         $feed->save();
         
@@ -54,7 +51,7 @@ class FeedsController extends Controller {
         Article::where('feed_id', '=', $newFeed->id)->delete();
 
         //Add all article from the current feed.
-        for($i = 0; $i < $rssData->getArticleQuantity(); $i++) {
+        for($i = 0; $i < $rssData->getArticleCount(); $i++) {
             try {
                 $article = new Article;
                 $article->title = $rssData->getTitle($i);

@@ -6,27 +6,25 @@ use App\Models\Feed;
 use App\Models\Article;
 use Illuminate\Http\Request;
 use App\Managers\FeedUpdater;
-use App\Managers\HashManager;
 
 class ArticlesController extends Controller
 {
     public function getArticleList(Request $request)
     {
+        $article = Article::where('title', 'LIKE', '%' . $request->search . '%');
+
         switch ($request->searchFilter) {
             case "newest":
-                $articles = Article::orderBy('pubdateTimestamp', 'DESC')->where('title', 'LIKE', '%' . $request->search . '%')->get();
+                $articles = $article->orderBy('pubdateTimestamp', 'DESC')->get();
                 return response()->json(array('result' => $this->concatSearchresults($articles), 'articleCount' => Article::count(), 'feedCount' => Feed::count()), 200);
-                break;
 
             case "oldest":
-                $articles = Article::orderBy('pubdateTimestamp', 'ASC')->where('title', 'LIKE', '%' . $request->search . '%')->get();
+                $articles = $article->orderBy('pubdateTimestamp', 'ASC')->get();
                 return response()->json(array('result' => $this->concatSearchresults($articles), 'articleCount' => Article::count(), 'feedCount' => Feed::count()), 200);
-                break;
 
             case "alphabetTitle":
-                $articles = Article::orderBy('title')->where('title', 'LIKE', '%' . $request->search . '%')->get();
+                $articles = $article->orderBy('title')->get();
                 return response()->json(array('result' => $this->concatSearchresults($articles), 'articleCount' => Article::count(), 'feedCount' => Feed::count()), 200);
-                break;
         }
     }
 
