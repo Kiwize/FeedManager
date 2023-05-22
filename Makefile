@@ -27,6 +27,7 @@ help: ## Display this help.
 .PHONY: build
 build: ## 🏗️  Build docker image
 	@echo "Build docker project"
+	@composer install
 	@docker-compose build
 
 .PHONY: build-no-cache

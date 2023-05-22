@@ -60,6 +60,7 @@ class FeedUpdater
 
                 // update article
                 switch ($rssData->getType()) {
+                    
                     case "xml":
                         $article
                             ->fill([

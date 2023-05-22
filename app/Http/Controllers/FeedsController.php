@@ -39,7 +39,6 @@ class FeedsController extends Controller
         if (!FeedManager::exists($request->link)) {
             $rssData = new RSSData($request->link);
             $newFeed = FeedManager::create($request->name, $request->link);
-
             //Add all article from the current feed.
             ArticleManager::createAllArticles($rssData, $newFeed->id);
         }

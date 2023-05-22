@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Managers\ArticleManager;
+use App\Managers\RSSData;
 use App\Models\Feed;
 use App\Models\Article;
 use Illuminate\Http\Request;
@@ -50,8 +51,18 @@ class ArticlesController extends Controller
         return response()->json(array('result' => $filteredArticles, 'articleCount' => Article::count(), 'feedCount' => Feed::count()), 200);
     }
 
-    public function refresh()
+    public static function addArticle(RSSData $rssData, int $id, int $feedID)
     {
-        FeedUpdater::update();
+        $newArticle = new Article;
+        $newArticle->title = $rssData->getTitle($id);
+        $newArticle->description = $rssData->getDescription($id);
+        $newArticle->link = $rssData->getLink($id);
+        $newArticle->guid = $rssData->getGUID($id);
+        $newArticle->static_hash = (string)(substr(md5((strtotime($rssData->getPubdate($id)) . substr(md5($rssData->getGUID($id)), 0, 6))), 0, 8));
+        $newArticle->dynamic_hash = (string)(substr(md5($rssData->getTitle($id)), 0, 6) . substr(md5($rssData->getDescription($id)), 0, 6) . substr(md5($rssData->getLink($id)), 0, 6));
+        $newArticle->pubdate = $rssData->getPubdate($id);
+        $newArticle->pubdate_timestamp = strtotime($rssData->getPubdate($id));
+        $newArticle->feed_id = $feedID;
+        $newArticle->save();
     }
 }
