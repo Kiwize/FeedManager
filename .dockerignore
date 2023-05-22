@@ -1,0 +1,24 @@
+# Directories
+docker
+docs
+tmp
+tests
+.git
+.cache
+.phpdoc
+.root
+bin
+
+# Files
+.env
+*.md
+!README.md
+.editorconfig
+auth.json
+.example.auth.json
+.gitlab-ci.yml
+.php.dependencies.phk
+DebianPackageStructure.yaml
+package.dist.json
+phpdoc.dist.yml
+phpDocumentor.phar
