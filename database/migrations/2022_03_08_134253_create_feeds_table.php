@@ -17,8 +17,6 @@ class CreateFeedsTable extends Migration
             $table->increments('id');
             $table->string('name', 50);
             $table->string('link', 150);
-            $table->unsignedInteger("articlesQuantity")->default(0);
-            $table->string('icon_link')->nullable()->default(null);
             $table->timestamps();
             $table->timestamp('published_at')->nullable();
         });

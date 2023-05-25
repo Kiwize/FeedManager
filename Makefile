@@ -79,8 +79,12 @@ db-init: ## Initialize database (reset, migrate and seed)
 
 .PHONY: test
 test: ## Make tests
-	@docker exec -ti news-feed-php-fpm bash -c 'composer run-script test'
+	@docker exec -ti news-feed-php-fpm bash -c './vendor/bin/phpunit --coverage-html coverage'
 
 .PHONY: test-coverage
 test-coverage: ## Make tests
 	@docker exec -ti news-feed-php-fpm bash -c 'composer run-script test:coverage'
+
+.PHONY: test-feeddbseed
+feeddbseed: ##DB Seeding for testing
+	@docker exec -ti news-feed-php-fpm bash -c 'composer run-script test:feeddbseed'

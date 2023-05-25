@@ -21,9 +21,9 @@ class CreateArticlesTable extends Migration
             $table->mediumText('guid');
             $table->string('category')->nullable()->default('uncategorized');
             $table->string('pubdate');
-            $table->string('pubdateTimestamp');
-            $table->string('staticHash')->default("nostatichash");
-            $table->string('dynamicHash')->default("nodynamichash");
+            $table->string('pubdate_timestamp');
+            $table->string('static_hash')->default("nostatichash");
+            $table->string('dynamic_hash')->default("nodynamichash");
             $table->timestamps();
             $table->timestamp('published_at')->nullable()->useCurrent();
             $table->unsignedInteger('feed_id');

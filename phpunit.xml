@@ -22,9 +22,9 @@
         <server name="BCRYPT_ROUNDS" value="4"/>
         <server name="CACHE_DRIVER" value="array"/>
         <server name="DB_CONNECTION" value="mysql"/>
-        <server name="DB_DATABASE" value="laraveldb"/>
-        <server name="DB_USERNAME" value="laravel"/>
-        <server name="DB_PASSWORD" value="laravelpassworddb"/>
+        <server name="DB_DATABASE" value="news_feed"/>
+        <server name="DB_USERNAME" value="admin"/>
+        <server name="DB_PASSWORD" value="admin"/>
         <server name="HOST" value="db"/>
         <server name="DB_PORT" value="3306"/>
         <server name="DB_ROOT_PASSWORD" value="root"/>

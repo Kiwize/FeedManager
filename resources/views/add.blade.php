@@ -28,12 +28,6 @@
                     <label for="link">URL de la source</label>
                     <input type="text" id="link" name="link" required>
                 </div>
-                <div>
-                    <label for="ilink">(Optionel) URL de l'icone de la source</label>
-                    <input type="text" id="ilink" name="ilink">
-                </div>
-                
-
                 <input id="submit_button" type="submit" value="Ajouter">
             </form>
         </section>

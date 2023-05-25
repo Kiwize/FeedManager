@@ -4,64 +4,94 @@ namespace App\Managers;
 
 use App\Models\Feed;
 use App\Models\Article;
+use ErrorException;
 
 class FeedUpdater
 {
-    public static function update()
+    /**
+     * update
+     *
+     * @return array
+     */
+    public static function update(): array
     {
         $addedArticles = 0;
         $modifiedArticles = 0;
         $unchangedArticles = 0;
         $articlesBeforeUpdate = Article::count();
+        $articlesBeforeUpdate = 0;
 
         $hashManager = new HashManager;
-        $allFeedsLinks = Feed::select(['link', 'id', 'articlesQuantity'])->get();
+        $allFeedsLinks = Feed::select(['link', 'id'])->get();
 
         $startTime = microtime(true);
 
         foreach ($allFeedsLinks as $feed) {
             $rssData = new RSSData($feed->link);
+
             for ($i = 0; $i < $rssData->getArticleCount(); $i++) {
-                $rssArticle = $rssData
-                    ->getArticle($i);
+                $rssArticle = $rssData->getArticle($i);
 
                 $feedHashedArticle = $hashManager
                     ->hashArticle(
-                        $rssArticle
+                        $rssData,
+                        $i
                     );
 
                 /** @var \App\Models\Article|null $article */
-                $article = Article::where('staticHash', '=', $feedHashedArticle['staticHash'])->first();
-
-                // no article found: create it
-                if (true === is_null($article)) {
-                    FeedUpdater::addArticle(
+                $article = Article::where('static_hash', '=', $feedHashedArticle['static_hash'])->first();
+                if (is_null($article) === true) {
+                    ArticleManager::createArticle(
                         $rssData,
                         $i,
                         $feed->id
                     );
 
                     $addedArticles++;
-                    $feed->fill(['articleQuantity' => ($feed->articleQuantity + 1)]);
                     continue;
                 }
 
                 // compare rss article and model article modified attributes values
                 // depending of their dynamic hashe
-                if ($article->dynamicHash === $feedHashedArticle['dynamicHash']) {
+                if (strcmp($article->dynamic_hash, $feedHashedArticle['dynamic_hash']) === 0) {
                     $unchangedArticles++;
-
                     continue;
                 }
 
                 // update article
-                $article
-                    ->fill([
-                        'link' => $rssArticle->link,
-                        'title' => $rssArticle->title,
-                        'description' => $rssArticle->description,
-                    ])
-                    ->save();
+                switch ($rssData->getType()) {
+                    case "xml":
+                        $article
+                            ->fill([
+                                'link' => $rssArticle->link,
+                                'title' => $rssArticle->title,
+                                'description' => $rssArticle->description,
+                            ])
+                            ->save();
+                        break;
+
+                    case "json":
+                        try {
+                            $article
+                                ->fill([
+                                    'link' => $rssArticle->url,
+                                    'title' => $rssArticle->title,
+                                    'description' => mb_substr($rssArticle->content_html, 0, 250, "utf-8"),
+                                ])
+                                ->save();
+                        } catch (ErrorException $ex) {
+                            $article
+                                ->fill([
+                                    'link' => $rssArticle->url,
+                                    'title' => "Missing title",
+                                    'description' => mb_substr($rssArticle->content_html, 0, 250, "utf-8"),
+                                ])
+                                ->save();
+                        }
+                        break;
+                    default:
+                        die;
+                }
 
                 $modifiedArticles++;
             }
@@ -78,20 +108,5 @@ class FeedUpdater
             'articlesFound' => Article::count(),
             'executionTime' => $executionTime
         );
-    }
-
-    private static function addArticle(RSSData $rssData, int $id, int $feedID)
-    {
-        $newArticle = new Article;
-        $newArticle->title = $rssData->getTitle($id);
-        $newArticle->description = $rssData->getDescription($id);
-        $newArticle->link = $rssData->getLink($id);
-        $newArticle->guid = $rssData->getGUID($id);
-        $newArticle->staticHash = (string)(substr(md5((strtotime($rssData->getPubdate($id)) . substr(md5($rssData->getGUID($id)), 0, 6))), 0, 8));
-        $newArticle->dynamicHash = (string)(substr(md5($rssData->getTitle($id)), 0, 6) . substr(md5($rssData->getDescription($id)), 0, 6) . substr(md5($rssData->getLink($id)), 0, 6));
-        $newArticle->pubdate = $rssData->getPubdate($id);
-        $newArticle->pubdateTimestamp = strtotime($rssData->getPubdate($id));
-        $newArticle->feed_id = $feedID;
-        $newArticle->save();
     }
 }

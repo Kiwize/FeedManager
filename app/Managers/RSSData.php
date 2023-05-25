@@ -2,65 +2,170 @@
 
 namespace App\Managers;
 
+use ErrorException;
+use Exception;
+use Illuminate\Support\Facades\Log;
+use PHPUnit\Framework\ExceptionWrapper;
 use SimpleXMLElement;
+use UnexpectedValueException;
 
 class RSSData
 {
-    protected SimpleXMLElement $xmlObject;
+    protected object $data;
     protected string $url;
     protected int $articleCount;
+    private string $dataType;
 
+    /**
+     * __construct
+     *
+     * @param  mixed $url
+     * @return void
+     */
     public function __construct(string $url)
     {
-        $this->url = $url;  
-        $this->xmlObject = new SimpleXMLElement(file_get_contents($url));
-        $this->articleCount = count($this->xmlObject->channel->item);
+        if (filter_var($url, FILTER_VALIDATE_URL) === false)
+            throw new UnexpectedValueException("Invalid URL");
+        $this->url = $url;
+        $this->dataType = $this->parse($url);
     }
 
-    public function getArticle($id): Object
+    /**
+     * getArticle
+     *
+     * @param  int $id
+     * @return object
+     */
+    public function getArticle(int $id): object
     {
-        return $this->xmlObject->channel->item[$id];
+        if ($this->dataType === "xml") {
+            return $this->data->channel->item[$id];
+        } else {
+            return $this->data->items[$id];
+        }
     }
 
-    public function getTitle($id): string
+    /**
+     * getTitle
+     *
+     * @param  int $id
+     * @return string
+     */
+    public function getTitle(int $id): string
     {
-        return (string)$this->xmlObject->channel->item[$id]->{'title'};
+        if ($this->dataType === "xml") {
+            return (string) $this->data->channel->item[$id]->{'title'};
+        } else {
+            try {
+                return (string) $this->data->items[$id]->title;
+            } catch (ErrorException $ex) {
+                return "Missing title";
+            }
+        }
     }
 
-    public function getDescription($id): string
+    /**
+     * getDescription
+     *
+     * @param  int $id
+     * @return string
+     */
+    public function getDescription(int $id): string
     {
-        return (string)$this->xmlObject->channel->item[$id]->{'description'};
+        if ($this->dataType === "xml") {
+            return (string) $this->data->channel->item[$id]->{'description'};
+        } else {
+            return (string) substr($this->data->items[$id]->content_html, 0, 250) . " (...)";
+        }
     }
 
-    public function getLink($id): string
+    /**
+     * getLink
+     *
+     * @param  int $id
+     * @return string
+     */
+    public function getLink(int $id): string
     {
-        return $this->xmlObject->channel->item[$id]->link;
+        if ($this->dataType === "xml") {
+            try {
+                return $this->data->channel->item[$id]->link;
+            } catch (ErrorException $ex) {
+                return $this->data->channel[$id]->link;
+            }
+        } else {
+            return $this->data->items[$id]->url;
+        }
     }
 
-    public function getGUID($id): string
+    /**
+     * getGUID
+     *
+     * @param  int $id
+     * @return string
+     */
+    public function getGUID(int $id): string
     {
-        return $this->xmlObject->channel->item[$id]->guid;
+        if ($this->dataType === "xml") {
+            return $this->data->channel->item[$id]->guid;
+        } else {
+            return $this->data->items[$id]->id;
+        }
     }
 
-    public function getPubdate($id): string
+    /**
+     * getPubdate
+     *
+     * @param  int $id
+     * @return string
+     */
+    public function getPubdate(int $id): string
     {
-        return $this->xmlObject->channel->item[$id]->pubDate;
+        if ($this->dataType === "xml") {
+            return $this->data->channel->item[$id]->pubDate;
+        } else {
+            return $this->data->items[$id]->date_published;
+        }
     }
 
-
-    //Getters
-    public function getURL(): string
-    {
-        return $this->url;
-    }
-
-    public function getXMLObject(): SimpleXMLElement
-    {
-        return $this->xmlObject;
-    }
-
+    /**
+     * getArticleCount
+     *
+     * @return int
+     */
     public function getArticleCount(): int
     {
         return $this->articleCount;
+    }
+
+
+    /**
+     * getType
+     * Return "xml" or "json"
+     * @return string
+     */
+    public function parse(string $url): string
+    {
+        try {
+            $this->data = new SimpleXMLElement(file_get_contents($url));
+            $this->articleCount = count($this->data->channel->item);
+            return "xml";
+        } catch (Exception $ex) {
+            // Log::warning('XML Feed parsing error !' . $ex);
+        }
+
+        $this->data = json_decode(file_get_contents($url, false));
+        $this->articleCount = count($this->data->items);
+        return "json";
+    }
+
+    public function getType(): string
+    {
+        return $this->dataType;
+    }
+
+    public function getURL(): string
+    {
+        return $this->url;
     }
 }
