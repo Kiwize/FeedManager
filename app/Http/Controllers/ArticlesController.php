@@ -6,9 +6,11 @@ use App\Managers\ArticleManager;
 use App\Managers\RSSData;
 use App\Models\Feed;
 use App\Models\Article;
+use DateTime;
 use Illuminate\Http\Request;
 use App\Managers\FeedUpdater;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class ArticlesController extends Controller
@@ -18,8 +20,14 @@ class ArticlesController extends Controller
      *
      * @return JsonResponse
      */
-    public function index() {
-        $articles = DB::table('articles')->paginate(2);
+    public function index(Request $request) {
+        if(is_null($request->articlePerPage)) $articlePerPage = 6; else $articlePerPage = $request->articlePerPage;
+        $articles = Article::orderBy('title')->cursorPaginate($articlePerPage);
+        
+        $articles->getCollection()->map(function ($value) {
+            return ArticleManager::toJson($value);
+        });
+
         return response()->json($articles);
     }
     
@@ -29,17 +37,20 @@ class ArticlesController extends Controller
      * @param  Request $request
      * @return JsonResponse
      */
-    public function store(Request $request) {
-        $articles = Article::
-        where('title', 'LIKE', '%' . $request->titleFilter . "%")
-        ->where('description', 'like', '%' . $request->descriptionFilter . "%")
-        ->orderBy('title')
-        ->whereBetween('pubdate_timestamp', [strtotime($request->from), strtotime($request->to)])
-        ->cursorPaginate($request->articlesPerPage);
-
+     public function store(Request $request) {
+        $articles = Article::orderBy('title')
+            ->where('title', 'LIKE', '%' . $request->titleFilter . "%")
+            ->where('description', 'like', '%' . $request->descriptionFilter . "%")
+            ->whereBetween('pubdate', [$request->from, $request->to])
+            ->cursorPaginate($request->articlesPerPage);
+    
+        $articles->getCollection()->map(function ($value) {
+            return ArticleManager::toJson($value);
+        });
+    
         return response()->json($articles);
     }
-
+    
     /**
      * getArticleList
      *

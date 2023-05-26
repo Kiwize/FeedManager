@@ -99,21 +99,6 @@ class RSSData
     }
 
     /**
-     * getGUID
-     *
-     * @param  int $id
-     * @return string
-     */
-    public function getGUID(int $id): string
-    {
-        if ($this->dataType === "xml") {
-            return $this->data->channel->item[$id]->guid;
-        } else {
-            return $this->data->items[$id]->id;
-        }
-    }
-
-    /**
      * getPubdate
      *
      * @param  int $id

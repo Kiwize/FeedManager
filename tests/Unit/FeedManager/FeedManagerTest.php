@@ -8,6 +8,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use function PHPUnit\Framework\assertFalse;
+use function PHPUnit\Framework\assertInstanceOf;
 use function PHPUnit\Framework\assertIsArray;
 use function PHPUnit\Framework\assertTrue;
 
@@ -29,11 +30,8 @@ class FeedManagerTest extends TestCase
     }
 
     public function testFeedDeletion() {
-        assertIsArray($feeds = FeedManager::getFromLink("https://inessential.com/feed.json"));
-
-        foreach($feeds as $feed) {
-            FeedManager::delete($feed->id);
-        }
+        $feed = FeedManager::getFromLink("https://inessential.com/feed.json");
+        FeedManager::delete($feed->id);
 
         assertFalse(FeedManager::exists("https://inessential.com/feed.json"));
     }

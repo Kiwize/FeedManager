@@ -33,14 +33,7 @@ class FeedManager {
         return $ids;
     }
 
-    public static function getFromLink(string $link): array {
-        $results = Feed::where('link', '=', $link)->get();
-        $feeds = array();
-
-        foreach($results as $result) {
-            array_push($feeds, $result);
-        }
-
-        return $feeds;
+    public static function getFromLink(string $link): Feed {
+        return Feed::where('link', '=', $link)->first();
     }
 }

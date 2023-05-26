@@ -5,12 +5,14 @@ namespace App\Managers;
 
 use App\Models\Article;
 use App\Models\Feed;
+use Carbon\Carbon;
+use DateTime;
 use ErrorException;
 use Illuminate\Support\Facades\Log;
 
 class ArticleManager
 {
-    
+
     /**
      * createAllArticles
      * Ajoute en base de données tous les articles d'un flux. La fonction s'arrète au moment où
@@ -19,14 +21,16 @@ class ArticleManager
      * @param  mixed $feedID ID du flux
      * @return bool true si les articles ont été ajoutés, false sinon.
      */
-    public static function createAllArticles(RSSData $rssData, int $feedID) : bool{
-        for($x = 0; $x < $rssData->getArticleCount(); $x++) {
-            if(ArticleManager::createArticle($rssData, $x, $feedID) === false) return false;
+    public static function createAllArticles(RSSData $rssData, int $feedID): bool
+    {
+        for ($x = 0; $x < $rssData->getArticleCount(); $x++) {
+            if (ArticleManager::createArticle($rssData, $x, $feedID) === false)
+                return false;
         }
 
         return true;
     }
-    
+
     /**
      * createArticle
      * Ajoute un article d'un flux dans la base de données.
@@ -37,41 +41,97 @@ class ArticleManager
      */
     public static function createArticle(RSSData $rssData, int $id, int $feedID): bool
     {
+        
         $hm = new HashManager;
         $hashes = $hm->hashArticle($rssData, $id);
-
+        $newArticle = new Article;
         try {
-            $newArticle = new Article;
+            $carbonDate = new Carbon(new DateTime($rssData->getPubdate($id)));
             $newArticle->title = $rssData->getTitle($id);
             $newArticle->description = $rssData->getDescription($id);
             $newArticle->link = $rssData->getLink($id);
-            $newArticle->guid = $rssData->getGUID($id);
             $newArticle->static_hash = $hashes['static_hash'];
             $newArticle->dynamic_hash = $hashes['dynamic_hash'];
-            $newArticle->pubdate = $rssData->getPubdate($id);
-            $newArticle->pubdate_timestamp = strtotime($rssData->getPubdate($id));
+            $newArticle->pubdate = Carbon::parse($carbonDate);
             $newArticle->feed_id = $feedID;
             $newArticle->save();
             return true;
         } catch (ErrorException $ex) {
-            Log::error('Unable to create article, malformed RSS Feed !\n'.$ex);
+            Log::error('Unable to create article, malformed RSS Feed !\n' . $ex);
             $newArticle->delete();
             return false;
         }
     }
 
-        
+    public static function toJson($article): array
+    {
+        $response = array();
+        $feed = Feed::where('id', "=", $article->feed_id)->first();
+
+        $formattedArticle =
+            array(
+                "title" => $article->title,
+                "title_detail" => [
+                    "type" => "text/plain",
+                    "language" => "null",
+                    "base" => "",
+                    "value" => $article->title
+                ],
+                "links" => [
+                    "rel" => "alternate",
+                    "type" => "text/html",
+                    "href" => $article->link
+                ],
+                "link" => $article->link,
+                "summary" => $article->description,
+                "summary_detail" => [
+                    "type" => "text/html",
+                    "language" => "null",
+                    "base" => "",
+                    "value" => $article->description
+                ],
+                "authors" => ["name" => $feed->link],
+                "author" => $feed->link,
+                "author_detail" => [
+                    "name" => $feed->link,
+                    "published" => $article->pubdate,
+                    "published_parsed" => [
+                        ArticleManager::parseDate($article->pubdate)
+                    ],
+                    "source" =>
+                    [
+                        "href" => $feed->link,
+                        "title" => $feed->name
+                    ]
+                ]
+            );
+        array_push($response, $formattedArticle);
+        return $response;
+    }
+
+    /**
+     * parseDate
+     * 
+     * @param  mixed $timestamp
+     * @return array
+     */
+    public static function parseDate($pubdate): array
+    {
+        return array_values(array_slice(date_parse($pubdate), 0, 6));
+    }
+
     /**
      * sortArticles
      * Trie les articles selont leurs titre ou date de publication. 
      * @param  string $searchFilter
      * @return array
      */
-    public static function sortArticles(string $searchFilter): array {
+    public static function sortArticles(string $searchFilter): array
+    {
 
         switch ($searchFilter) {
             case "oldest":
-                $articles = Article::orderBy('pubdate_timestamp', 'ASC')->get();
+                $articles = Article::orderBy('pubdate', 'ASC')->get();
                 break;
 
             case "alphabetTitle":
@@ -79,11 +139,11 @@ class ArticleManager
                 break;
 
             default:
-                $articles = Article::orderBy('pubdate_timestamp', 'DESC')->get();
+                $articles = Article::orderBy('pubdate', 'DESC')->get();
         }
-        
+
         $filteredArticles = array();
-        foreach($articles as $filteredArticle) {
+        foreach ($articles as $filteredArticle) {
             array_push($filteredArticles, $filteredArticle);
         }
 
