@@ -22,10 +22,11 @@ class ArticlesController extends Controller
      */
     public function index(Request $request) {
         if(is_null($request->articlePerPage)) $articlePerPage = 6; else $articlePerPage = $request->articlePerPage;
-        $articles = Article::orderBy('title')->cursorPaginate($articlePerPage);
-        
-        $articles->getCollection()->map(function ($value) {
-            return ArticleManager::toJson($value);
+        $articles = tap(DB::table('articles')->paginate($articlePerPage), function($paginatedInstance) {
+            return $paginatedInstance->getCollection()->transform(function ($value) {
+                $value = ArticleManager::toJson($value);
+                return $value;
+            });
         });
 
         return response()->json($articles);
@@ -36,21 +37,24 @@ class ArticlesController extends Controller
      * 
      * @param  Request $request
      * @return JsonResponse
-     */
-     public function store(Request $request) {
-        $articles = Article::orderBy('title')
-            ->where('title', 'LIKE', '%' . $request->titleFilter . "%")
-            ->where('description', 'like', '%' . $request->descriptionFilter . "%")
-            ->whereBetween('pubdate', [$request->from, $request->to])
-            ->cursorPaginate($request->articlesPerPage);
-    
-        $articles->getCollection()->map(function ($value) {
-            return ArticleManager::toJson($value);
+     */ 
+
+     
+    public function store(Request $request) {
+        $articles = tap(Article::
+        where('title', 'LIKE', '%' . $request->titleFilter . "%")
+        ->where('description', 'like', '%' . $request->descriptionFilter . "%")
+        ->whereBetween('pubdate', [$request->from, $request->to])
+        ->paginate($request->articlesPerPage), function($paginatedInstance) {
+            return $paginatedInstance->getCollection()->transform(function ($value) {
+                $value = ArticleManager::toJson($value);
+                return $value;
+            });
         });
-    
+
         return response()->json($articles);
-    }
-    
+    }   
+
     /**
      * getArticleList
      *
