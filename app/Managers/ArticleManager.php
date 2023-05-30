@@ -5,9 +5,11 @@ namespace App\Managers;
 
 use App\Models\Article;
 use App\Models\Feed;
+use App\Tools\ArticleTools;
 use Carbon\Carbon;
 use DateTime;
 use ErrorException;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class ArticleManager
@@ -23,11 +25,14 @@ class ArticleManager
      */
     public static function createAllArticles(RSSData $rssData, int $feedID): bool
     {
+        DB::beginTransaction();
         for ($x = 0; $x < $rssData->getArticleCount(); $x++) {
-            if (ArticleManager::createArticle($rssData, $x, $feedID) === false)
-                return false;
+            if (ArticleManager::createArticle($rssData, $x, $feedID) === false) {
+                DB::rollBack();
+                return false;              
+            }     
         }
-
+        DB::commit();
         return true;
     }
 
@@ -62,7 +67,13 @@ class ArticleManager
             return false;
         }
     }
-
+    
+    /**
+     * toJson
+     * Convertit un article en un objet JSON compatible pour la MMI
+     * @param  mixed $article 
+     * @return array Object JSON formatté pour la MMI
+     */
     public static function toJson($article): array
     {
         $response = array();
@@ -96,7 +107,7 @@ class ArticleManager
                     "name" => $feed->link,
                     "published" => $article->pubdate,
                     "published_parsed" => [
-                        ArticleManager::parseDate($article->pubdate)
+                        ArticleTools::parseDate($article->pubdate)
                     ],
                     "source" =>
                     [
@@ -107,17 +118,6 @@ class ArticleManager
             );
         array_push($response, $formattedArticle);
         return $response;
-    }
-
-    /**
-     * parseDate
-     * 
-     * @param  mixed $timestamp
-     * @return array
-     */
-    public static function parseDate($pubdate): array
-    {
-        return array_values(array_slice(date_parse($pubdate), 0, 6));
     }
 
     /**
