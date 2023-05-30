@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Managers\FeedManager;
 use App\Managers\FeedUpdater;
 use App\Models\Feed;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 use function PHPUnit\Framework\assertFalse;
@@ -12,6 +13,8 @@ use function PHPUnit\Framework\assertIsArray;
 
 class FeedUpdateTest extends TestCase
 {
+    use DatabaseTransactions;
+
     public function testFeedUpdate()
     {
         $response = $this->get('/article-refresh-request');
@@ -21,13 +24,6 @@ class FeedUpdateTest extends TestCase
     }
 
     public function testFeedUpdateNewFeed() {
-        $feeds = FeedManager::getFromLink("https://inessential.com/feed.json");
-
-        foreach($feeds as $feed) {
-            FeedManager::delete($feed->id);
-        }
-
-        assertFalse(FeedManager::exists("https://inessential.com/feed.json"));
         FeedManager::create("unit_test_feed_00", "https://inessential.com/feed.json");
         Feed::where('name', '=', "unit_test_feed_01")->delete();
         FeedManager::create("unit_test_feed_01", "https://www.mediapart.fr/articles/feed?userid=3889de42-d648-4812-85bc-2fbdef626c24");

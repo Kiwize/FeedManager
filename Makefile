@@ -75,6 +75,10 @@ db-init: ## Initialize database (reset, migrate and seed)
 	@docker exec -ti news-feed-php-fpm bash -c 'php artisan migrate'
 	@docker exec -ti news-feed-php-fpm bash -c 'php artisan migrate:refresh --seed'
 
+.PHONY: docker-bash
+docker-bash: #Run bash in the PHP Docker
+	@docker exec -it news-feed-php-fpm bash
+
 ##@ 🗃️  Quality
 
 .PHONY: test

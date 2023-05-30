@@ -19,7 +19,7 @@ class HashManager
     {
         if ($rssData->getArticleCount() > $id - 1 && $id >= 0)
             return array(
-                'static_hash' => (string) (substr(md5((strtotime($rssData->getPubdate($id)) . substr(md5($rssData->getGUID($id)), 0, 6))), 0, 8)),
+                'static_hash' => (string) (substr(md5((strtotime($rssData->getPubdate($id)))), 0, 8)),
                 'dynamic_hash' => (string) (substr(md5($rssData->getTitle($id)), 0, 6) . substr(md5($rssData->getDescription($id)), 0, 6))
             );
         else

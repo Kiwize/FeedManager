@@ -18,10 +18,8 @@ class CreateArticlesTable extends Migration
             $table->string('title');
             $table->mediumText('description');
             $table->mediumText('link');
-            $table->mediumText('guid');
             $table->string('category')->nullable()->default('uncategorized');
             $table->string('pubdate');
-            $table->string('pubdate_timestamp');
             $table->string('static_hash')->default("nostatichash");
             $table->string('dynamic_hash')->default("nodynamichash");
             $table->timestamps();
