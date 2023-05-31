@@ -3,12 +3,15 @@
 
 namespace App\Managers;
 
-use App\Models\Article;
-use App\Models\Feed;
-use App\Tools\ArticleTools;
-use Carbon\Carbon;
 use DateTime;
+use Carbon\Carbon;
 use ErrorException;
+use App\Models\Feed;
+use App\Models\Article;
+use App\Managers\RSSData;
+use App\Tools\ArticleTools;
+use App\Managers\FeedManager;
+use App\Managers\HashManager;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -21,18 +24,39 @@ class ArticleManager
      * un article ne peux pas être ajouté.
      * @param  mixed $rssData Données RSS
      * @param  mixed $feedID ID du flux
-     * @return bool true si les articles ont été ajoutés, false sinon.
+     * @return bool true si tous les articles ont été ajoutés, false sinon.
      */
     public static function createAllArticles(RSSData $rssData, int $feedID): bool
-    {
+    {   
         DB::beginTransaction();
+        $articles = array();
+
         for ($x = 0; $x < $rssData->getArticleCount(); $x++) {
-            if (ArticleManager::createArticle($rssData, $x, $feedID) === false) {
-                DB::rollBack();
-                return false;              
-            }     
+            $article = ArticleManager::getArticle($rssData, $x, $feedID);
+            if(is_null($article))
+                return false;
+            else
+                array_push($articles, $article->toArray());
         }
+
+        Article::insert($articles);
         DB::commit();
+        return true;
+    }
+    
+    /**
+     * createAllArticlesArray
+     * Permet d'ajouter tous les articles de plusieurs flux.
+     * @param  mixed $rssDataURLs URLs des flux RSS
+     * @return bool true si tous les articles ont été ajoutés, false sinon.
+     */
+    public static function createAllArticlesArray(array $rssDataURLs):bool {
+        foreach($rssDataURLs as $url) {
+            $testRSSData = new RSSData($url);
+            $testFeed = FeedManager::create("unit_test_feed", $url);
+            if(ArticleManager::createAllArticles($testRSSData, $testFeed->id) === false)
+                return false;           
+        }
         return true;
     }
 
@@ -46,7 +70,26 @@ class ArticleManager
      */
     public static function createArticle(RSSData $rssData, int $id, int $feedID): bool
     {
-        
+        try {
+            $newArticle = ArticleManager::getArticle($rssData, $id, $feedID);
+            $newArticle->save();
+            return true;
+        } catch (ErrorException $ex) {
+            Log::error('Unable to create article, malformed RSS Feed !\n' . $ex);
+            return false;
+        }
+    }
+    
+    /**
+     * getArticle
+     * Permet de récupérer un article précis d'un flux RSS.
+     * @param  mixed $rssData Données du flux RSS
+     * @param  mixed $id ID de l'article dans le flux
+     * @param  mixed $feedID ID du flux dans la base de données
+     * @return Article Si l'article a été trouvé.
+     * @return null Si une erreur s'est produite.
+     */
+    public static function getArticle(RSSData $rssData, int $id, int $feedID): ?Article {
         $hm = new HashManager;
         $hashes = $hm->hashArticle($rssData, $id);
         $newArticle = new Article;
@@ -59,13 +102,12 @@ class ArticleManager
             $newArticle->dynamic_hash = $hashes['dynamic_hash'];
             $newArticle->pubdate = Carbon::parse($carbonDate);
             $newArticle->feed_id = $feedID;
-            $newArticle->save();
-            return true;
         } catch (ErrorException $ex) {
             Log::error('Unable to create article, malformed RSS Feed !\n' . $ex);
-            $newArticle->delete();
-            return false;
+            return null;
         }
+
+        return $newArticle;
     }
     
     /**

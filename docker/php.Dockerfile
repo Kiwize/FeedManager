@@ -1,4 +1,4 @@
-FROM php:7.4-fpm AS php_fpm
+FROM php:8.1-fpm AS php_fpm
 
 LABEL MAINTAINER Alexandre ANDRE <a.andre@prohacktive.io>
 
