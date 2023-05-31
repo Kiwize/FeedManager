@@ -22,3 +22,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('events', "App\Http\Controllers\ArticlesController@index");
 Route::post('events/search', "App\Http\Controllers\ArticlesController@store");
+
+Route::get('events/{locale}', "App\Http\Controllers\ArticlesController@getLocale");

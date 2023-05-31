@@ -126,7 +126,7 @@ class ArticleManager
                 "title" => $article->title,
                 "title_detail" => [
                     "type" => "text/plain",
-                    "language" => "null",
+                    "language" => $article->locale,
                     "base" => "",
                     "value" => $article->title
                 ],
@@ -139,7 +139,7 @@ class ArticleManager
                 "summary" => $article->description,
                 "summary_detail" => [
                     "type" => "text/html",
-                    "language" => "null",
+                    "language" => $article->locale,
                     "base" => "",
                     "value" => $article->description
                 ],

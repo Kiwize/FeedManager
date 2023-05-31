@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Config\Config;
 use App\Managers\ArticleManager;
-use App\Managers\Config;
 use App\Managers\RSSData;
 use App\Models\Feed;
 use App\Models\Article;
-use DateTime;
 use Illuminate\Http\Request;
 use App\Managers\FeedUpdater;
 use Illuminate\Http\JsonResponse;
@@ -16,6 +15,18 @@ use Illuminate\Support\Facades\DB;
 
 class ArticlesController extends Controller
 {
+    public function getLocale(Request $request): JsonResponse {
+        $articles = tap(Article::where('locale', "=", $request->locale)->paginate(Config::getArticlesPerPages()), function ($paginatedInstance) {
+            return $paginatedInstance->getCollection()->transform(function ($value) {
+                $value = ArticleManager::toJson($value);
+                return $value;
+            });
+        });
+
+        return response()->json($articles);
+    }
+
+
     /**
      * index
      *
@@ -43,8 +54,6 @@ class ArticlesController extends Controller
      * @param  Request $request
      * @return JsonResponse
      */
-
-
     public function store(Request $request): JsonResponse
     {
         $articles = tap(Article::

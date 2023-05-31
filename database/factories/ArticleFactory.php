@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Article;
+use App\Models\Feed;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 class ArticleFactory extends Factory
@@ -21,7 +22,8 @@ class ArticleFactory extends Factory
             'description' => $this->faker->paragraph(20),
             'link' => $this->faker->unique()->url(),
             'pubdate' => now(),
-            'feed_id' => 1
+            'locale' => $this->faker->languageCode(),
+            'feed_id' => Feed::get()->first()
         ];
     }
 }
