@@ -2,17 +2,18 @@
 
 namespace Tests\Unit\ArticleManager;
 
-use App\Managers\ArticleManager;
-use App\Managers\FeedManager;
-use App\Managers\RSSData;
-use App\Models\Feed;
 use ErrorException;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-
-use function PHPUnit\Framework\assertFalse;
+use App\Models\Feed;
+use App\Managers\RSSData;
+use App\Managers\FeedManager;
+use App\Managers\ArticleManager;
 use function PHPUnit\Framework\assertTrue;
+use function PHPUnit\Framework\assertFalse;
+
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use UnexpectedValueException;
 
 class ArticleManagerTest extends TestCase
 {
@@ -20,12 +21,24 @@ class ArticleManagerTest extends TestCase
 
     public function testCreateAllArticlesFromFeed()
     {
-        $testRSSData = new RSSData("https://inessential.com/feed.json");
-        $testFeed = FeedManager::create("unit_test_feed_00", "https://inessential.com/feed.json");
-        assertTrue(ArticleManager::createAllArticles($testRSSData, $testFeed->id));
+        $rssURL = array(
+            'https://www.01net.com/feed/',
+            'https://www.abondance.com/feed',
+            'http://feeds.feedburner.com/bhmag',
+            'https://www.clubic.com/articles.rss',
+            'https://www.commentcamarche.net/forum/actualites-high-tech-8?fmt=rss',
+            'http://feeds.feedburner.com/cowcotland',
+            'http://feeds.feedburner.com/ConseilConfig',
+            'https://www.configspc.com/feed/',
+            'https://www.cnetfrance.fr/feeds/rss/'
+        );
 
-        assertFalse(ArticleManager::createArticle($testRSSData, -1, $testFeed->id));
+        assertTrue(ArticleManager::createAllArticlesArray($rssURL));
 
-        Feed::where("link", "=", "https://inessential.com/feed.json")->delete();
+        $this->expectException(UnexpectedValueException::class);
+        ArticleManager::createAllArticlesArray(array("https://youtube.com"));
+
+        $this->expectException(ErrorException::class);
+        ArticleManager::createAllArticlesArray(array("https://hqsdhfqsjf.com"));
     }
 }

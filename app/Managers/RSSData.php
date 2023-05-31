@@ -26,8 +26,12 @@ class RSSData
     {
         if (filter_var($url, FILTER_VALIDATE_URL) === false)
             throw new UnexpectedValueException("Invalid URL");
+
+        
         $this->url = $url;
         $this->dataType = $this->parse($url);
+        if($this->dataType === "unknown")
+            throw new UnexpectedValueException("Invalid data format !");
     }
 
     /**
@@ -139,9 +143,13 @@ class RSSData
             // Log::warning('XML Feed parsing error !' . $ex);
         }
 
-        $this->data = json_decode(file_get_contents($url, false));
-        $this->articleCount = count($this->data->items);
-        return "json";
+        if(is_null(json_decode(file_get_contents($url, false))) === false) {
+            $this->data = json_decode(file_get_contents($url, false));
+            $this->articleCount = count($this->data->items);
+            return "json";
+        }
+
+        return 'unknown';        
     }
 
     public function getType(): string
