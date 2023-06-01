@@ -18,8 +18,8 @@ class FeedSeeder extends Seeder
         $feeds = array(
             'https://inessential.com/feed.json',
             'https://korben.info/feed',
-            'https://azure.microsoft.com/en-us/blog/feed/',
-            'https://mspoweruser.com/feed/');
+            'https://azure.microsoft.com/en-us/blog/feed/'
+        );
 
         foreach($feeds as $feed) {
             DB::table("feeds")->insert([

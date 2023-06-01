@@ -51,4 +51,13 @@ class RSSDataTest extends TestCase {
         assertIsString($xmlData->getLink(0));
     }
 
+    public function testGetLocale() {
+        $jsonData = new RSSData("https://inessential.com/feed.json");
+        $xmlData = new RSSData("https://www.mediapart.fr/articles/feed?userid=065ba7dd-f62c-4e8a-b70f-b2c3215802d1");
+        assertIsString($jsonData->getLocale());
+        assertIsString($xmlData->getLocale());
+        assertEquals($jsonData->getLocale(), "en");
+        assertEquals($xmlData->getLocale(), "fr");
+    }
+
 }

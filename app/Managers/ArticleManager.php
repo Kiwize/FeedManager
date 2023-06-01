@@ -101,6 +101,7 @@ class ArticleManager
             $newArticle->static_hash = $hashes['static_hash'];
             $newArticle->dynamic_hash = $hashes['dynamic_hash'];
             $newArticle->pubdate = Carbon::parse($carbonDate);
+            $newArticle->locale = $rssData->getLocale();
             $newArticle->feed_id = $feedID;
         } catch (ErrorException $ex) {
             Log::error('Unable to create article, malformed RSS Feed !\n' . $ex);
