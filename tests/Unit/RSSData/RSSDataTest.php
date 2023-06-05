@@ -58,6 +58,13 @@ class RSSDataTest extends TestCase {
         assertIsString($xmlData->getLocale());
         assertEquals($jsonData->getLocale(), "en");
         assertEquals($xmlData->getLocale(), "fr");
+
+        $response = $this->get("/api/events/fr", [
+            'articlesPerPage' => 6,
+            'page' => 2
+        ]);
+
+        $response->assertStatus(200);
     }
 
 }

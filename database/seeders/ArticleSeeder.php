@@ -9,8 +9,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ArticleSeeder extends Seeder
 {
-    use RefreshDatabase;
-
     public function run()
     {
         FeedManager::create("feed_article_factory", "https://inessential.com/feed.json");

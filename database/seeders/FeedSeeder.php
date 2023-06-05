@@ -24,10 +24,7 @@ class FeedSeeder extends Seeder
         foreach($feeds as $feed) {
             DB::table("feeds")->insert([
                 'name' => Str::random(8),
-                'link' => $feed,
-                'created_at' => now(),
-                'updated_at' => now(),
-                'published_at' => now()
+                'link' => $feed
             ]);
         }  
     }

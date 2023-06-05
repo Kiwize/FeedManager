@@ -123,7 +123,6 @@ class ArticleManager
     {
         $response = array();
         $feed = Feed::where('id', "=", $article->feed_id)->first();
-        var_dump($feed);
 
         $formattedArticle =
             array(
