@@ -5,8 +5,8 @@ use App\Models\Feed;
 
 class FeedManager {
 
-    public static function delete(int $id) {
-        Feed::where('id', '=', $id)->delete();
+    public static function delete(int $id):bool {
+        return Feed::where('id', '=', $id)->delete();
     }
 
     public static function create(string $name, string $link):Feed {

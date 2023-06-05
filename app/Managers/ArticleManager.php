@@ -12,6 +12,8 @@ use App\Managers\RSSData;
 use App\Tools\ArticleTools;
 use App\Managers\FeedManager;
 use App\Managers\HashManager;
+use Error;
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -74,7 +76,7 @@ class ArticleManager
             $newArticle = ArticleManager::getArticle($rssData, $id, $feedID);
             $newArticle->save();
             return true;
-        } catch (ErrorException $ex) {
+        } catch (Error $ex) {
             Log::error('Unable to create article, malformed RSS Feed !\n' . $ex);
             return false;
         }
@@ -121,6 +123,7 @@ class ArticleManager
     {
         $response = array();
         $feed = Feed::where('id', "=", $article->feed_id)->first();
+        var_dump($feed);
 
         $formattedArticle =
             array(
@@ -169,7 +172,7 @@ class ArticleManager
      * @param  string $searchFilter
      * @return array
      */
-    public static function sortArticles(string $searchFilter): array
+    public static function sortArticles(?string $searchFilter): array
     {
 
         switch ($searchFilter) {
