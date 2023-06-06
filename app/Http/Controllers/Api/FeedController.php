@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\api;
+namespace App\Http\Controllers\Api;
 
 use App\Config\Config;
 use App\Http\Controllers\Controller;
@@ -18,7 +18,7 @@ use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
-class APIFeedsController extends Controller
+class FeedController extends Controller
 {
     /**
      * getFeedList
