@@ -1,7 +1,8 @@
 <?php
 
-use App\Http\Controllers\ArticlesController;
-use App\Http\Controllers\FeedsController;
+use App\Http\Controllers\api\APIArticlesController;
+use App\Http\Controllers\api\APIFeedsController;
+use App\Managers\FeedUpdater;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -20,8 +21,17 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('events', "App\Http\Controllers\ArticlesController@index");
-Route::get('events/{locale}', "App\Http\Controllers\ArticlesController@getLocale");
+### Article related routes ###
 
-Route::post('events', "App\Http\Controllers\FeedsController@addFeed");
-Route::post('events/search', "App\Http\Controllers\ArticlesController@store");
+Route::get('articles', [APIArticlesController::class, "fetch"]);
+Route::get('articles/locales', [APIArticlesController::class, "listAvailableLocales"]);
+Route::get("articles/refresh", [APIArticlesController::class, 'refresh']);
+Route::post('articles/search', [APIArticlesController::class, 'fetch']);
+
+### Feed related routes ###
+
+Route::get("feeds", [APIFeedsController::class, 'fetch']);
+Route::put('feeds/create', [APIFeedsController::class, 'store']);
+Route::delete("feeds/delete", [APIFeedsController::class, 'delete']);
+
+

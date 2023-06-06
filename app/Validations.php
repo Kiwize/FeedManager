@@ -2,71 +2,72 @@
 
 namespace App;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
 
 class Validations
 {
 
-    public static function validateAddFeed(Request $request): bool
+    public static function feedStoreValidation(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|max:20',
             'link' => 'required|url'
         ]);
 
-        return $validator->fails();
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
+        }
+
+        return response()->json();
     }
 
-    public static function validateDeleteFeed(Request $request): bool
+    public static function feedDeleteIDValidation(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'feedID' => 'required|integer'
         ]);
 
-        return $validator->fails();
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
+        }
+
+        return response()->json();
     }
 
-    public static function validateGetLocale(Request $request): bool
-    {
-        $validator = Validator::make($request->all(), [
-            'articlesPerPage' => 'integer',
-            'page' => 'integer'
-        ]);
-
-        return $validator->fails();
-    }
-
-    public static function validateIndex(Request $request): bool
-    {
-        $validator = Validator::make($request->all(), [
-            'articlesPerPage' => 'integer',
-            'page' => 'integer'
-        ]);
-
-        return $validator->fails();
-    }
-
-    public static function validateStore(Request $request): bool
+    public static function articlesFetchSearchValidation(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'titleFilter' => 'max:32',
             'descriptionFilter' => 'max:255',
-            'from' => 'required|date_format:Y-m-d H:i:s',
-            'to' => 'required|date_format:Y-m-d H:i:s',
-            'articlesPerPage' => 'required|integer',
-            'page' => 'integer'
+            'locale' => 'string|max:2',
+            'from' => 'date_format:Y-m-d H:i:s',
+            'to' => 'date_format:Y-m-d H:i:s',
+            'resultsPerPage' => 'integer',
+            'page' => 'required|integer'
         ]);
 
-        return $validator->fails();
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
+        }
+
+        return response()->json();
     }
 
-    public static function validateGetArticleList(Request $request): bool
+    public static function articlesFetchValidation(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'search' => 'max:255|alpha'
+            'results' => 'required|integer',
+            'resultsPerPage' => 'integer',
+            'page' => 'required|integer'
         ]);
 
-        return $validator->fails();
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
+        }
+
+        return response()->json();
     }
 }

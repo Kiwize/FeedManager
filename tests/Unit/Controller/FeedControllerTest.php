@@ -10,42 +10,40 @@ class FeedControllerTest extends TestCase {
     
     use DatabaseTransactions;
     public function testGetFeedList() {
-        $response = $this->get("/feed-getlist-request");
+        $response = $this->get("/api/feeds");
         $response->assertStatus(200);
     }
 
     public function testDeleteFeed() {
-        $response = $this->post("/feed-delete-request", []);
-        
+        $response = $this->delete("/api/feeds/delete", []);
         $response->assertStatus(400);
 
-        $response = $this->post("/feed-delete-request", [
+        $response = $this->delete("/api/feeds/delete", [
             'feedID' => Feed::first()->id
         ]);
 
-        $response->assertStatus(200);
+        $response->assertStatus(204);
 
-        $response = $this->post("/feed-delete-request", [
+        $response = $this->delete("/api/feeds/delete", [
             'feedID' => 9999
         ]);
-
-        $response->assertStatus(400);
+        $response->assertStatus(404);
     }
 
     public function testAddFeed() {
-        $response = $this->post("/api/events", []);
+        $response = $this->put("/api/feeds/create", []);
         $response->assertStatus(400);
 
-        $response = $this->post("/api/events", [
+        $response = $this->put("/api/feeds/create", [
             'name' => 'unit_test_feed_00',
             'link' => 'https://inessential.com/feed.json'
         ]);
         
         $response->assertStatus(400);
 
-        FeedManager::delete(FeedManager::getFromLink('https://inessential.com/feed.json')->id);
+        Feed::where('link', '=', 'https://inessential.com/feed.json')->delete();
 
-        $response = $this->post("/api/events", [
+        $response = $this->put("/api/feeds/create", [
             'name' => 'unit_test_feed_00',
             'link' => 'https://inessential.com/feed.json'
         ]);

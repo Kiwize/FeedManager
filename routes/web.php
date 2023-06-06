@@ -1,5 +1,6 @@
 <?php
 
+use App\Managers\FeedUpdater;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -28,10 +29,3 @@ Route::get("/add", function() {
 Route::get("/search", function() {
     return view("/search");
 });
-
-Route::post("feed-delete-request", 'App\Http\Controllers\FeedsController@deleteFeed');
-
-Route::get("feed-getlist-request", 'App\Http\Controllers\FeedsController@getFeedList');
-Route::get("article-getlist-request", 'App\Http\Controllers\ArticlesController@getArticleList');
-Route::get("filter-feed-request", 'App\Http\Controllers\FeedsController@feedFilterInit');
-Route::get("article-refresh-request", "App\Http\Controllers\ArticlesController@refresh");
