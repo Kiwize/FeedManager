@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\ArticlesController;
-use App\Http\Controllers\FeedsController;
+use App\Http\Controllers\Api\ArticleController;
+use App\Http\Controllers\Api\FeedController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -20,5 +20,17 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('events', "App\Http\Controllers\ArticlesController@index");
-Route::post('events/search', "App\Http\Controllers\ArticlesController@store");
+### Article related routes ###
+
+Route::get('articles', [ArticleController::class, "fetch"]);
+Route::get('articles/locales', [ArticleController::class, "listAvailableLocales"]);
+Route::get("articles/refresh", [ArticleController::class, 'refresh']);
+Route::post('articles/search', [ArticleController::class, 'fetch']);
+
+### Feed related routes ###
+
+Route::get("feeds", [FeedController::class, 'fetch']);
+Route::put('feeds/create', [FeedController::class, 'store']);
+Route::delete("feeds/delete", [FeedController::class, 'delete']);
+
+

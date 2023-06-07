@@ -12,6 +12,8 @@ use App\Managers\RSSData;
 use App\Tools\ArticleTools;
 use App\Managers\FeedManager;
 use App\Managers\HashManager;
+use Error;
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -74,7 +76,7 @@ class ArticleManager
             $newArticle = ArticleManager::getArticle($rssData, $id, $feedID);
             $newArticle->save();
             return true;
-        } catch (ErrorException $ex) {
+        } catch (Error $ex) {
             Log::error('Unable to create article, malformed RSS Feed !\n' . $ex);
             return false;
         }
@@ -101,6 +103,7 @@ class ArticleManager
             $newArticle->static_hash = $hashes['static_hash'];
             $newArticle->dynamic_hash = $hashes['dynamic_hash'];
             $newArticle->pubdate = Carbon::parse($carbonDate);
+            $newArticle->locale = $rssData->getLocale();
             $newArticle->feed_id = $feedID;
         } catch (ErrorException $ex) {
             Log::error('Unable to create article, malformed RSS Feed !\n' . $ex);
@@ -126,7 +129,7 @@ class ArticleManager
                 "title" => $article->title,
                 "title_detail" => [
                     "type" => "text/plain",
-                    "language" => "null",
+                    "language" => $article->locale,
                     "base" => "",
                     "value" => $article->title
                 ],
@@ -139,7 +142,7 @@ class ArticleManager
                 "summary" => $article->description,
                 "summary_detail" => [
                     "type" => "text/html",
-                    "language" => "null",
+                    "language" => $article->locale,
                     "base" => "",
                     "value" => $article->description
                 ],
@@ -168,7 +171,7 @@ class ArticleManager
      * @param  string $searchFilter
      * @return array
      */
-    public static function sortArticles(string $searchFilter): array
+    public static function sortArticles(?string $searchFilter): array
     {
 
         switch ($searchFilter) {

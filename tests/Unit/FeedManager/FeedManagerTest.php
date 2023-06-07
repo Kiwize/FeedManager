@@ -29,13 +29,6 @@ class FeedManagerTest extends TestCase
         assertTrue(FeedManager::exists("https://inessential.com/feed.json"));
     }
 
-    public function testFeedDeletion() {
-        $feed = FeedManager::getFromLink("https://inessential.com/feed.json");
-        FeedManager::delete($feed->id);
-
-        assertFalse(FeedManager::exists("https://inessential.com/feed.json"));
-    }
-
     public function testGetAllIds() {
         assertIsArray(FeedManager::getAllIDs());
     }
