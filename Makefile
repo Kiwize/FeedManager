@@ -80,6 +80,9 @@ docker-bash: #Run bash in the PHP Docker
 	@docker exec -it news-feed-php-fpm bash
 
 ##@ 🗃️  Quality
+.PHONY: parallel-test-coverage
+parallel-test-coverage: #Run paratest in html coverage mode
+	@docker exec -it news-feed-php-fpm bash -c './vendor/bin/paratest --coverage-html coverage/'
 
 .PHONY: test
 test: ## Make tests

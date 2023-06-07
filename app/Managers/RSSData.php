@@ -2,11 +2,12 @@
 
 namespace App\Managers;
 
+require_once 'Text/LanguageDetect.php';
+
 use ErrorException;
 use Exception;
-use Illuminate\Support\Facades\Log;
-use PHPUnit\Framework\ExceptionWrapper;
 use SimpleXMLElement;
+use Text_LanguageDetect;
 use UnexpectedValueException;
 
 class RSSData
@@ -47,6 +48,20 @@ class RSSData
         } else {
             return $this->data->items[$id];
         }
+    }
+    
+    /**
+     * getLocale
+     *
+     * @return string Renvoie la langue du flux au format ISO 639-1, soit un code à deux lettres (fr, en, de...).
+     */
+    public function getLocale(): string {
+        $sampleTest = $this->getDescription(0);
+        $ld = new Text_LanguageDetect();
+        $ld->setNameMode(2);
+        $result = $ld->detectSimple($sampleTest);
+
+        return $result;
     }
 
     /**

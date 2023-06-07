@@ -9,11 +9,9 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ArticleSeeder extends Seeder
 {
-    use RefreshDatabase;
-
     public function run()
     {
         FeedManager::create("feed_article_factory", "https://inessential.com/feed.json");
-        ArticleFactory::new()->count(35565)->create();
+        ArticleFactory::new()->count(10)->create();
     }
 }

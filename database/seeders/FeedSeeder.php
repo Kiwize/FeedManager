@@ -18,16 +18,13 @@ class FeedSeeder extends Seeder
         $feeds = array(
             'https://inessential.com/feed.json',
             'https://korben.info/feed',
-            'https://azure.microsoft.com/en-us/blog/feed/',
-            'https://mspoweruser.com/feed/');
+            'https://azure.microsoft.com/en-us/blog/feed/'
+        );
 
         foreach($feeds as $feed) {
             DB::table("feeds")->insert([
                 'name' => Str::random(8),
-                'link' => $feed,
-                'created_at' => now(),
-                'updated_at' => now(),
-                'published_at' => now()
+                'link' => $feed
             ]);
         }  
     }
