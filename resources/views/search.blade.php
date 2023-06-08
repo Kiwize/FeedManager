@@ -18,19 +18,21 @@
     <!--Articles retriever and updater scripts-->
     <script type="text/javascript" src="<?php echo "js/articleManager.js" ?>"></script>
     @include('header')
+    <div id="content">
+        <!--Page selector on top of the main page-->
+        <div class="pageOverview text-center d-flex flex-row justify-content-center mt-3 mb-4 pb-2 pt-2 w-50" id="pageOverviewTop">
+            <button class="previousPageButton btn btn-primary m-2">Page précédente</button>
+            <p class="pageCounter text-center mt-auto mb-auto"></p>
+            <button class="nextPageButton btn btn-primary m-2">Page suivante</button>
+        </div>
 
-    <!--Page selector on top of the main page-->
-    <div class="pageOverview text-center d-flex flex-row justify-content-center mt-3 mb-4 pb-2 pt-2 w-50" id="pageOverviewTop">
-        <button class="previousPageButton btn btn-primary m-2">Page précédente</button>
-        <p class="pageCounter text-center mt-auto mb-auto"></p>
-        <button class="nextPageButton btn btn-primary m-2">Page suivante</button>
+        <section class="page container d-flex flex-column justify-content-center">
+            <div id="article_list" class=" text-center">
+                <!-- Articles are inserted here ! -->
+            </div>
+        </section>
     </div>
 
-    <section class="page container d-flex flex-column justify-content-center">
-        <div id="article_list" class=" text-center">
-            <!-- Articles are inserted here ! -->
-        </div>
-    </section>
     <style>
         .pageOverview {
             background-color: #313539;

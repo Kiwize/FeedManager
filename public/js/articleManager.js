@@ -8,6 +8,11 @@ function getArticleList(_url = currentPage) {
       alert(xhr.responseText);
     },
     success: function (data) {
+      if(Object.keys(data.data).length === 0) {
+        $("#content").html("<h2 class='h2 text-center mt-4'>Aucun article à afficher...</h2>");
+        return;
+      }
+
       document.getElementsByClassName("nextPageButton")[0].onclick =
         function () {
           if (data.current_page < data.last_page) {
