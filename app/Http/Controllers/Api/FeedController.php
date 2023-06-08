@@ -29,7 +29,7 @@ class FeedController extends Controller
      */
     public function fetch(): JsonResponse
     {
-        return response()->json(array('result' => Feed::paginate(Config::RESULTS_PER_PAGES)));
+        return response()->json(array('result' => Feed::paginate(Feed::count())));
     }
 
     /**

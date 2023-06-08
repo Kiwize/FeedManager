@@ -8,26 +8,33 @@ function getArticleList(_url = currentPage) {
       alert(xhr.responseText);
     },
     success: function (data) {
-      if(Object.keys(data.data).length === 0) {
-        $("#content").html("<h2 class='h2 text-center mt-4'>Aucun article à afficher...</h2>");
+      if (Object.keys(data.data).length === 0) {
+        $("#content").html(
+          "<h2 class='h2 text-center mt-4'>Aucun article à afficher...</h2>"
+        );
         return;
       }
 
-      document.getElementsByClassName("nextPageButton")[0].onclick =
-        function () {
-          if (data.current_page < data.last_page) {
-            currentPage = data.next_page_url + "&results=20";
-            getArticleList(currentPage);
-          }
-        };
+      if (Object.keys(data.data).length > 0 && data.last_page === 1) {
+        $("#prev").remove();
+        $("#next").remove();
+      } else {
+        document.getElementsByClassName("nextPageButton")[0].onclick =
+          function () {
+            if (data.current_page < data.last_page) {
+              currentPage = data.next_page_url + "&results=20";
+              getArticleList(currentPage);
+            }
+          };
 
-      document.getElementsByClassName("previousPageButton")[0].onclick =
-        function () {
-          if (data.current_page > 1) {
-            currentPage = data.prev_page_url + "&results=20";
-            getArticleList(currentPage);
-          }
-        };
+        document.getElementsByClassName("previousPageButton")[0].onclick =
+          function () {
+            if (data.current_page > 1) {
+              currentPage = data.prev_page_url + "&results=20";
+              getArticleList(currentPage);
+            }
+          };
+      }
 
       var articleHTML = "";
       var articles = Object.values(data.data);
@@ -52,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function feedUpdate() {
     $.ajax({
       url: "/api/articles/refresh",
-      type: "GET"
+      type: "GET",
     });
   }
 

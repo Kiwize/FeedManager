@@ -19,11 +19,12 @@
     <script type="text/javascript" src="<?php echo "js/articleManager.js" ?>"></script>
     @include('header')
     <div id="content">
+        <h2 class="h2 text-center mt-4">Les dernières parutions</h2>
         <!--Page selector on top of the main page-->
         <div class="pageOverview text-center d-flex flex-row justify-content-center mt-3 mb-4 pb-2 pt-2 w-50" id="pageOverviewTop">
-            <button class="previousPageButton btn btn-primary m-2">Page précédente</button>
+            <button id="prev" class="previousPageButton btn btn-primary m-2">Page précédente</button>
             <p class="pageCounter text-center mt-auto mb-auto"></p>
-            <button class="nextPageButton btn btn-primary m-2">Page suivante</button>
+            <button id="next" class="nextPageButton btn btn-primary m-2">Page suivante</button>
         </div>
 
         <section class="page container d-flex flex-column justify-content-center">
