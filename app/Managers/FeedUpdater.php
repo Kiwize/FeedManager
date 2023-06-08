@@ -30,7 +30,11 @@ class FeedUpdater
         $startTime = microtime(true);
 
         foreach ($allFeedsLinks as $feed) {
-            $rssData = new RSSData($feed->link);
+            try {
+                $rssData = new RSSData($feed->link);
+            } catch (ErrorException $ex) {
+                continue;
+            }
 
             for ($i = 0; $i < $rssData->getArticleCount(); $i++) {
                 $rssArticle = $rssData->getArticle($i);
