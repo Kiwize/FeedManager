@@ -29,13 +29,13 @@ class ArticleManager
      * @return bool true si tous les articles ont été ajoutés, false sinon.
      */
     public static function createAllArticles(RSSData $rssData, int $feedID): bool
-    {   
+    {
         DB::beginTransaction();
         $articles = array();
 
         for ($x = 0; $x < $rssData->getArticleCount(); $x++) {
             $article = ArticleManager::getArticle($rssData, $x, $feedID);
-            if(is_null($article))
+            if (is_null($article))
                 return false;
             else
                 array_push($articles, $article->toArray());
@@ -45,19 +45,20 @@ class ArticleManager
         DB::commit();
         return true;
     }
-    
+
     /**
      * createAllArticlesArray
      * Permet d'ajouter tous les articles de plusieurs flux.
      * @param  mixed $rssDataURLs URLs des flux RSS
      * @return bool true si tous les articles ont été ajoutés, false sinon.
      */
-    public static function createAllArticlesArray(array $rssDataURLs):bool {
-        foreach($rssDataURLs as $url) {
+    public static function createAllArticlesArray(array $rssDataURLs): bool
+    {
+        foreach ($rssDataURLs as $url) {
             $testRSSData = new RSSData($url);
             $testFeed = FeedManager::create("unit_test_feed", $url);
-            if(ArticleManager::createAllArticles($testRSSData, $testFeed->id) === false)
-                return false;           
+            if (ArticleManager::createAllArticles($testRSSData, $testFeed->id) === false)
+                return false;
         }
         return true;
     }
@@ -81,7 +82,7 @@ class ArticleManager
             return false;
         }
     }
-    
+
     /**
      * getArticle
      * Permet de récupérer un article précis d'un flux RSS.
@@ -91,7 +92,8 @@ class ArticleManager
      * @return Article Si l'article a été trouvé.
      * @return null Si une erreur s'est produite.
      */
-    public static function getArticle(RSSData $rssData, int $id, int $feedID): ?Article {
+    public static function getArticle(RSSData $rssData, int $id, int $feedID): ?Article
+    {
         $hm = new HashManager;
         $hashes = $hm->hashArticle($rssData, $id);
         $newArticle = new Article;
@@ -112,7 +114,7 @@ class ArticleManager
 
         return $newArticle;
     }
-    
+
     /**
      * toJson
      * Convertit un article en un objet JSON compatible pour la MMI
@@ -121,11 +123,9 @@ class ArticleManager
      */
     public static function toJson($article): array
     {
-        $response = array();
         $feed = Feed::where('id', "=", $article->feed_id)->first();
-
         $formattedArticle =
-            array(
+            [
                 "title" => $article->title,
                 "title_detail" => [
                     "type" => "text/plain",
@@ -160,9 +160,8 @@ class ArticleManager
                         "title" => $feed->name
                     ]
                 ]
-            );
-        array_push($response, $formattedArticle);
-        return $response;
+            ];
+        return $formattedArticle;
     }
 
     /**
