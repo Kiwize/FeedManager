@@ -12,6 +12,7 @@ use App\Models\Article;
 use App\Models\Feed;
 use App\Validations;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Redirector;
@@ -77,7 +78,7 @@ class FeedController extends Controller
                 $addedArticles = Article::where('feed_id', '=', $newFeed->id)->count();
             }
 
-            return response()->json(['created_feed' => $newFeed, 'added_articles' => $addedArticles], Response::HTTP_CREATED);
+            return response()->json(['created_feed' => $newFeed, 'added_articles' => $addedArticles], Response::HTTP_CREATED);  
         } else {
             return response()->json(['error' => $request->link . ' is already registred.'], Response::HTTP_BAD_REQUEST);
         }

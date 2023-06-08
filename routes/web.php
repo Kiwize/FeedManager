@@ -1,6 +1,7 @@
 <?php
 
 use App\Managers\FeedUpdater;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,17 +16,13 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('home');
+    return view('search');
 });
 
-Route::get("/manager", function() {
+Route::get("/manager", function () {
     return view('manager');
 });
 
-Route::get("/add", function() {
+Route::get("/add", function () {
     return view('add');
-});
-
-Route::get("/search", function() {
-    return view("/search");
 });
