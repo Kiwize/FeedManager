@@ -20,45 +20,28 @@ use App\Http\Controllers\FeedsController;
 <body onload="javascript:loadFeedsFromDB()" class=" nv-background" data-bs-theme="dark">
     <script type="text/javascript" src="<?php echo "js/feedManager.js" ?>"></script>
     @include('header')
-    <div class="parent flex-row d-flex justify-content-start fixed bg-">
-        <aside id="feed_list_section" class=" col-md-4 ml-2 custom-aside">
-            <div id="feed_list" class=" flex-column d-flex">
-            </div>
-        </aside>
-        <section id="feed_view_section" class=" container-fluid">
-            <div id="feed_view" class="">
-                <!--Default values-->
-                <h2 id="feed_name_text" class=" font">Aucune source sélectionnée.</h2>
-                <p id="feed_url_text">URL > <a id="feed_url_link" href=""></a></p>
-            </div>
-        </section>
-    </div>
-    <div class="fixed-bottom container">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="rounded-pill p-2 d-flex flex-row justify-content-center buttons-container">
-                    <button id="add_button" class="btn btn-primary" onclick="window.location.replace('/add');">Ajouter</button>
-                    <button id="remove_button" class="btn btn-danger" onclick="javascript:deleteFeed();" disabled>Supprimer</button>
-                </div>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="rounded-pill p-2 d-flex flex-row justify-content-center buttons-container">
+                <button id="add_button" class="btn btn-primary" onclick="window.location.replace('/add');">Ajouter</button>
             </div>
         </div>
     </div>
-    <style>
-        .custom-aside {
-            width: 250px;
-        }
+    <div class="parent flex-row d-flex justify-content-start fixed bg-">
+        <table class="table table-dark table-striped table-bordered table-sm">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Nom</th>
+                    <th scope="col">Lien</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody id="feed_list">
 
-        .buttons-container {
-            background-color: rgba(20, 20, 20, 80);
-            box-shadow: 0px 0px black 10px;
-        }
-
-        /* Espacement des boutons */
-        .fixed-bottom .btn {
-            margin-right: 2px;
-            margin-left: 2px;
-        }
-    </style>
+            </tbody>
+        </table>
+    </div>
 </body>
 
 </html>

@@ -8,9 +8,9 @@
     <link href="/css/notification.css" rel="stylesheet">
 
     <header class=" bg-primary pb-2 pt-2">
-        <nav class=" round flex-sm-row d-flex justify-content-center container">
-            <ul><a class=" lead text-white" href="/">Accueil</a></ul>
-            <ul><a class=" lead text-white" href="/manager">Sources</a></ul>
+        <nav class=" round flex-sm-row d-flex justify-content-center">
+            <ul class="p-0 mx-2"><a class="lead text-white" href="/">Accueil</a></ul>
+            <ul class="p-0 mx-2"><a class="lead text-white" href="/manager">Sources</a></ul>
         </nav>
         <div id="notification-container"></div>
     </header>

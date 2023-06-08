@@ -28,7 +28,7 @@ function getArticleList(_url = currentPage) {
       var articles = Object.values(data.data);
 
       articles.forEach((element) => {
-        articleHTML += "<p>" + element[0].title + "</p>";
+        articleHTML += "<p>" + element.title + "</p>";
       });
 
       $("#article_list").html(articleHTML);

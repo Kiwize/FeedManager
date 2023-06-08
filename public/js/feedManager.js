@@ -11,42 +11,28 @@ function loadFeedsFromDB() {
   $.ajax({
     url: "/api/feeds",
     type: "GET",
-    error: function () {
-      alert("Cannot list feeds from database !");
+    error: function (xhr) {
+      showErrorNotification(xhr.responseJson);
     },
     success: function (data) {
-      console.log(data);
       var html = "";
       data.result.data.forEach((element) => {
-        html +=
-          "<button class='feedlink btn btn-primary mb-1 mt-1' onclick=\"linkOnClick('" +
-          element.name +
-          "','" +
-          element.link +
-          "','" +
-          element.id +
-          "');\">" +
-          element.name +
-          "</button>";
+        html += "<tr><th scope=\"row\"> " + element.id + "</th>" +
+        "<td><p class='lead'>" + element.name + "<p></td>" +
+        "<td><a href='"+element.link+"' target='_blank'>" + element.link + "</a></td>" +
+        "<td><button class=\"btn btn-danger\" onclick=\"deleteFeed("+ element.id + ",'" + element.name + "');\">Supprimer</button></td>" +
+        "</tr>"
       });
       $("#feed_list").html(html);
     },
   });
 }
 
-function linkOnClick(name, url, id) {
-  selectedFeed = name;
-  selectedFeedID = id;
-  document.getElementById("feed_name_text").textContent = name;
-  document.getElementById("feed_url_link").textContent = url;
-  document.getElementById("remove_button").disabled = false;
-}
-
-function deleteFeed() {
+function deleteFeed(_id, _name) {
   if (
     confirm(
       "Voulez-vous supprimer le flux " +
-        selectedFeed +
+        _name +
         " ?\nLa suppréssion de ce flux entraînera la suppréssion des articles associés."
     )
   ) {
@@ -54,21 +40,14 @@ function deleteFeed() {
       url: "/api/feeds/delete",
       type: "DELETE",
       data: {
-        feedID: selectedFeedID,
+        feedID: _id,
       },
       success: function () {
-        selectedFeed = null;
-        selectedFeedID = null;
-        document.getElementById("remove_button").disabled = true;
         location.reload();
+        showSuccessNotification("Flux supprimé avec succès !");
       },
-      error: function (err) {
-        alert(
-          "Echec de la suppréssion du flux : " +
-            selectedFeed +
-            "   " +
-            err.responseText
-        );
+      error: function (xhr) {
+        showErrorNotification(xhr.responseJson);
       },
     });
   }
