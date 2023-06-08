@@ -11,6 +11,7 @@
 
 <body data-bs-theme="dark">
     @include('header')
+
     <section class=" m-lg-3">
         <div class="container d-flex flex-column align-items-center">
             <div class=" form-sub-container p-4 rounded d-flex flex-column align-items-center">
@@ -31,6 +32,7 @@
     </section>
     <script>
         function submitForm() {
+            showLoadingScreen();
             $.ajax({
                 url: '/api/feeds/create',
                 type: "POST",
@@ -39,12 +41,15 @@
                     link: $('#link').val()
                 },
                 error: function(err) {
-                    alert(err.responseText);
-                }, 
+                    hideLoadingScreen();
+                    showErrorNotification(err.responseJSON);
+                },
                 success: function() {
+                    hideLoadingScreen();
                     window.location.replace('/manager');
+                    showSuccessNotification("Flux ajouté avec succès !");
                 }
-            }); 
+            });
         }
     </script>
     <style>
