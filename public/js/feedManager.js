@@ -17,11 +17,24 @@ function loadFeedsFromDB() {
     success: function (data) {
       var html = "";
       data.result.data.forEach((element) => {
-        html += "<tr><th scope=\"row\"> " + element.id + "</th>" +
-        "<td><p class='lead'>" + element.name + "<p></td>" +
-        "<td><a href='"+element.link+"' target='_blank'>" + element.link + "</a></td>" +
-        "<td><button class=\"btn btn-danger\" onclick=\"deleteFeed("+ element.id + ",'" + element.name + "');\">Supprimer</button></td>" +
-        "</tr>"
+        html +=
+          '<tr><th scope="row"> ' +
+          element.id +
+          "</th>" +
+          "<td><p class='lead'>" +
+          element.name +
+          "<p></td>" +
+          "<td><a href='" +
+          element.link +
+          "' target='_blank'>" +
+          element.link +
+          "</a></td>" +
+          '<td><button class="btn btn-danger" onclick="deleteFeed(' +
+          element.id +
+          ",'" +
+          element.name +
+          "');\">Supprimer</button></td>" +
+          "</tr>";
       });
       $("#feed_list").html(html);
     },
@@ -29,13 +42,9 @@ function loadFeedsFromDB() {
 }
 
 function deleteFeed(_id, _name) {
-  if (
-    confirm(
-      "Voulez-vous supprimer le flux " +
-        _name +
-        " ?\nLa suppréssion de ce flux entraînera la suppréssion des articles associés."
-    )
-  ) {
+  confirmPopup("Supprimer le flux " + _name + " ?", function () {
+    showLoadingScreen();
+    closeConfirmationPopup();
     $.ajax({
       url: "/api/feeds/delete",
       type: "DELETE",
@@ -43,12 +52,14 @@ function deleteFeed(_id, _name) {
         feedID: _id,
       },
       success: function () {
+        hideLoadingScreen();
         location.reload();
         showSuccessNotification("Flux supprimé avec succès !");
       },
       error: function (xhr) {
+        hideLoadingScreen();
         showErrorNotification(xhr.responseJson);
       },
     });
-  }
+  });
 }

@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Managers\FeedManager;
+use App\Models\Feed;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -69,10 +71,7 @@ class FeedSeeder extends Seeder
         );
 
         foreach ($feeds as $feed) {
-            DB::table("feeds")->insert([
-                'name' => $feed['name'],
-                'link' => $feed['url']
-            ]);
+            FeedManager::create($feed['name'], $feed['url']);
         }
     }
 }
