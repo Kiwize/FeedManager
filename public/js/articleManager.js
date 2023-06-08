@@ -1,102 +1,60 @@
-var showedPage = 1;
-var _data = null;
+var currentPage = "/api/articles?results=20&page=1";
 
-function limitArticleDescriptions() {
+function getArticleList(_url = currentPage) {
+  $.ajax({
+    url: _url,
+    type: "GET",
+    error: function (xhr) {
+      alert(xhr.responseText);
+    },
+    success: function (data) {
+      document.getElementsByClassName("nextPageButton")[0].onclick =
+        function () {
+          if (data.current_page < data.last_page) {
+            currentPage = data.next_page_url + "&results=20";
+            getArticleList(currentPage);
+          }
+        };
+
+      document.getElementsByClassName("previousPageButton")[0].onclick =
+        function () {
+          if (data.current_page > 1) {
+            currentPage = data.prev_page_url + "&results=20";
+            getArticleList(currentPage);
+          }
+        };
+
+      var articleHTML = "";
+      var articles = Object.values(data.data);
+
+      articles.forEach((element) => {
+        articleHTML += "<p>" + element[0].title + "</p>";
+      });
+
+      $("#article_list").html(articleHTML);
+      $(".pageCounter").html(data.current_page + " / " + data.last_page);
+    },
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  $.ajaxSetup({
+    headers: {
+      "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+    },
+  });
+
+  function feedUpdate() {
     $.ajax({
-        url: '/article_limitdesc_request',
-        type: "GET",
+      url: "/api/articles/refresh",
+      type: "GET"
     });
-}
+  }
 
-function getArticleList(_search = '', _searchFilter = 'newest') {
-    $.ajax({
-        url: '/article-getlist-request',
-        type: "POST",
-        data: {
-            search: _search,
-            searchFilter: _searchFilter,
-        },
-        error: function() {
-            alert("Cannot list articles from database !")
-        },
-        success: function(data) {
-            _data = data.result;
-            document.getElementById("currentPage").innerHTML = "Page " + showedPage;
-            document.getElementById("dbStats").innerHTML = data.articleCount + " articles enregistrés depuis " + data.feedCount + " sources.";
+  window.setInterval(function () {
+    feedUpdate();
+  }, 60 * 1000);
 
-            if (data.length === 0) {
-                $("#article_list").html("");
-                return;
-            }
-
-            function showPage(isNextPage) {
-                if (isNextPage && showedPage < _data.length) {
-                    showedPage++;
-                } else if (!isNextPage && showedPage > 1) {
-                    showedPage--;
-                }
-
-                document.getElementById("currentPage").innerHTML = "Page " + showedPage;
-                $("#article_list").html(_data[showedPage - 1]);
-                $(".pageCounter").html((showedPage) + " / " + _data.length);
-            }
-
-
-            for ($i = 0; $i < 2; $i++) {
-                document.getElementsByClassName("nextPageButton")[$i].onclick = function() {
-                    showPage(true);
-                }
-
-                document.getElementsByClassName("previousPageButton")[$i].onclick = function() {
-                    showPage(false);
-                }
-            }
-
-            $("#article_list").html(_data[showedPage - 1]);
-            $(".pageCounter").html((showedPage) + " / " + _data.length);
-
-        }
-    })
-}
-
-function getShowedPage() {
-    return showedPage;
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
-
-    function feedUpdate() {
-        $.ajax({
-            url: '/article-refresh-request',
-            type: "GET",
-            success: function() {
-                getArticleList(document.getElementById("searchbar").value, document.getElementById("searchFiltersDropdown").value);
-            }
-        })
-    }
-
-    var searchField = document.getElementById("searchbar");
-
-    searchField.addEventListener("keyup", function(event) {
-        if (event.keyCode === 13) {
-            getArticleList(document.getElementById('searchbar').value, document.getElementById('searchFiltersDropdown').value);
-        }
-    });
-
-    var select = document.querySelector('#searchFiltersDropdown');
-    select.addEventListener('change', function() {
-        getArticleList(document.getElementById("searchbar").value, document.getElementById("searchFiltersDropdown").value);
-    });
-
-    window.setInterval(function() {
-        feedUpdate();
-    }, 60 * 1000);
-
-    // GLHF
-    getArticleList();
-})
+  // GLHF
+  getArticleList();
+});
