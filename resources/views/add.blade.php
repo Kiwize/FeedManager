@@ -25,6 +25,7 @@
                     <input type="text" id="link" name="link" class="form-control" required>
                 </div>
                 <div class="mt-3">
+                    <button class="btn btn-danger" onclick="history.back()">Annuler</button>
                     <button id="submit_button" onclick="submitForm();" class="btn btn-primary">Ajouter</button>
                 </div>
             </div>
