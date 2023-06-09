@@ -30,5 +30,6 @@ Route::post('articles/search', [ArticleController::class, 'fetch']);
 ### Feed related routes ###
 
 Route::get("feeds", [FeedController::class, 'fetch']);
+Route::post("feeds", [FeedController::class, 'fetch']);
 Route::post('feeds/create', [FeedController::class, 'store']);
 Route::delete("feeds/delete", [FeedController::class, 'delete']);

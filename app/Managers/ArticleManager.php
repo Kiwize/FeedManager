@@ -56,7 +56,7 @@ class ArticleManager
     {
         foreach ($rssDataURLs as $url) {
             $testRSSData = new RSSData($url);
-            $testFeed = FeedManager::create("unit_test_feed", $url);
+            $testFeed = FeedManager::create("unit_test_feed", $url, null);
             if (ArticleManager::createAllArticles($testRSSData, $testFeed->id) === false)
                 return false;
         }
@@ -147,9 +147,10 @@ class ArticleManager
                     "value" => $article->description
                 ],
                 "authors" => ["name" => $feed->link],
-                "author" => $feed->link,
+                "author" => $feed->link, //TODO Logo de l'auteur / flux
                 "author_detail" => [
                     "name" => $feed->link,
+                    "id" => $feed->id,
                     "published" => $article->pubdate,
                     "published_parsed" => [
                         ArticleTools::parseDate($article->pubdate)

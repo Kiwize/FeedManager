@@ -5,7 +5,7 @@ function getArticleList(_url = currentPage) {
     url: _url,
     type: "GET",
     error: function (xhr) {
-      alert(xhr.responseText);
+      showErrorNotification(xhr.responseJson);
     },
     success: function (data) {
       if (Object.keys(data.data).length === 0) {
@@ -36,15 +36,52 @@ function getArticleList(_url = currentPage) {
           };
       }
 
-      var articleHTML = "";
-      var articles = Object.values(data.data);
+      const articles = Object.values(data.data);
+      var shownFeeds = [];
 
       articles.forEach((element) => {
-        articleHTML += "<p>" + element.title + "</p>";
+        if (!shownFeeds.includes(element.author_detail.id)) {
+          shownFeeds.push(element.author_detail.id);
+        }
       });
 
-      $("#article_list").html(articleHTML);
+      sendAPIFeedsPOSTRequest(shownFeeds, articles);
       $(".pageCounter").html(data.current_page + " / " + data.last_page);
+    },
+  });
+}
+
+function sendAPIFeedsPOSTRequest(shownFeeds, articles) {
+  $.ajax({
+    url: "/api/feeds",
+    type: "POST",
+    data: {
+      feed_id_array: shownFeeds,
+    },
+    error: function (xhr) {
+      showErrorNotification(xhr.responseJson);
+    },
+    success: function (_data) {
+      var articleHTML = "";
+      articles.forEach((element) => {
+        _data.forEach((feed) => {
+          if (feed.id === element.author_detail.id) {
+            articleHTML +=
+              "<tr>" +
+              "<th>" +
+              "<img class='img-thumbnail' src='"+feed.author_logo + "'>" +
+              "</th>" +
+              "<td>" +
+              element.title +
+              "</td>" +
+              "<td>" +
+              element.author_detail.published +
+              "</td>" +
+              "</tr>";
+          }
+        });
+      });
+      $("#article_tab").html(articleHTML);
     },
   });
 }

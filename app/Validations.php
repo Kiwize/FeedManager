@@ -10,6 +10,19 @@ use Illuminate\Support\Facades\Validator;
 class Validations
 {
 
+    public static function feedIDFetchValidation(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'feed_id_array' => 'required|array'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
+        }
+
+        return response()->json();
+    }
+
     public static function feedStoreValidation(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [

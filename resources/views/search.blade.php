@@ -28,8 +28,19 @@
         </div>
 
         <section class="page container d-flex flex-column justify-content-center">
-            <div id="article_list" class=" text-center">
-                <!-- Articles are inserted here ! -->
+            <div id="article_list" class=" container">
+                <table class=" table table-responsive-md table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col"></th>
+                            <th scope="col">Titre</th>
+                            <th scope="col">Date de publication</th>
+                        </tr>
+                    </thead>
+                    <tbody id="article_tab">
+
+                    </tbody>
+                </table>
             </div>
         </section>
     </div>
@@ -40,6 +51,12 @@
             border-radius: 30px;
             margin-left: auto;
             margin-right: auto;
+        }
+
+        img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
         }
     </style>
 </body>

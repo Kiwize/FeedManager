@@ -52,7 +52,7 @@ class ArticleController extends Controller
                 if ($validator->getStatusCode() !== Response::HTTP_OK) {
                     return $validator;
                 }
-                $latestArticles = Article::latest()->limit($request->results)->get();
+                $latestArticles = Article::orderBy('pubdate', 'DESC')->limit($request->results)->get();
                 $articles = tap($latestArticles->paginate($rpp), function ($paginatedInstance) {
                     return $paginatedInstance->getCollection()->transform(function ($value) {
                         $value = ArticleManager::toJson($value);

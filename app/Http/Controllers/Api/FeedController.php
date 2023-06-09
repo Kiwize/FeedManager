@@ -26,10 +26,24 @@ class FeedController extends Controller
      *
      * @return JsonResponse
      * @method GET /api/feeds
+     * @method POST /api/feeds(array ids)
      */
-    public function fetch(): JsonResponse
+    public function fetch(Request $request): JsonResponse
     {
-        return response()->json(array('result' => Feed::paginate(Feed::count())));
+        switch ($request->getMethod()) {
+            case "POST":
+                $validator = Validations::feedIDFetchValidation($request);
+                if ($validator->getStatusCode() != Response::HTTP_OK) {
+                    return $validator;
+                }
+
+                $ids = $request->feed_id_array;
+                $feeds = FeedManager::getFormIDArray($ids);
+                return response()->json($feeds);
+
+            default:
+                return response()->json(array('result' => Feed::paginate(Feed::count())));
+        }
     }
 
     /**
@@ -78,7 +92,7 @@ class FeedController extends Controller
                 $addedArticles = Article::where('feed_id', '=', $newFeed->id)->count();
             }
 
-            return response()->json(['created_feed' => $newFeed, 'added_articles' => $addedArticles], Response::HTTP_CREATED);  
+            return response()->json(['created_feed' => $newFeed, 'added_articles' => $addedArticles], Response::HTTP_CREATED);
         } else {
             return response()->json(['error' => $request->link . ' is already registred.'], Response::HTTP_BAD_REQUEST);
         }

@@ -27,7 +27,7 @@ use App\Http\Controllers\FeedsController;
             </div>
         </div>
     </div>
-    <div class="parent flex-row d-flex justify-content-start fixed bg-">
+    <div class="parent flex-row d-flex justify-content-start fixed container">
         <table class="table table-dark table-striped table-bordered table-sm">
             <thead>
                 <tr>
