@@ -17,7 +17,7 @@ class FeedManagerTest extends TestCase
     use DatabaseTransactions;
 
     public function testFeedCreation() {
-        $feed = FeedManager::create('unit_test_feed_00', "https://inessential.com/feed.json");
+        $feed = FeedManager::create('unit_test_feed_00', "https://inessential.com/feed.json", null);
         $this->assertDatabaseHas('feeds', [
             'name' => 'unit_test_feed_00',
             'link' => 'https://inessential.com/feed.json'
@@ -25,7 +25,7 @@ class FeedManagerTest extends TestCase
     }
 
     public function testFeedExists() {
-        FeedManager::create('unit_test_feed_00', "https://inessential.com/feed.json");
+        FeedManager::create('unit_test_feed_00', "https://inessential.com/feed.json", null);
         assertTrue(FeedManager::exists("https://inessential.com/feed.json"));
     }
 

@@ -32,7 +32,6 @@ class FeedUpdater
         foreach ($allFeedsLinks as $feed) {
             try {
                 $rssData = new RSSData($feed->link);
-                var_dump($rssData);
             } catch (ErrorException $ex) {
                 echo ($ex);
                 continue;

@@ -9,11 +9,24 @@ use Illuminate\Support\Facades\Validator;
 
 class Validations
 {
+    public static function feedSearchValidation(Request $request): JsonResponse {
+        $validator = Validator::make($request->all(), [
+            'nameFilter' => 'regex:/^[a-bA-B0-9 ]+$/',
+            'localeFilter' => 'max:2|string'
+        ]);
+
+        if($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
+        }
+
+        return response()->json();
+    }
 
     public static function feedFetchSearchValidation(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            
+            'nameFilter' => 'regex:/^[a-bA-B0-9 ]+$/',
+            'localeFilter' => 'max:2|string'
         ]);
 
         if ($validator->fails()) {

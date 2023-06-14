@@ -55,10 +55,14 @@ class ArticleManager
     public static function createAllArticlesArray(array $rssDataURLs): bool
     {
         foreach ($rssDataURLs as $url) {
-            $testRSSData = new RSSData($url);
-            $testFeed = FeedManager::create("unit_test_feed", $url, null);
-            if (ArticleManager::createAllArticles($testRSSData, $testFeed->id) === false)
+            try {
+                $testRSSData = new RSSData($url);
+                $testFeed = FeedManager::create("unit_test_feed", $url, null);
+                if (ArticleManager::createAllArticles($testRSSData, $testFeed->id) === false)
+                    return false;
+            } catch (ErrorException $ex) {
                 return false;
+            }
         }
         return true;
     }
@@ -115,7 +119,8 @@ class ArticleManager
         return $newArticle;
     }
 
-    public static function countArticlesFromFeed(Feed $feed): int {
+    public static function countArticlesFromFeed(Feed $feed): int
+    {
         return Article::where('feed_id', '=', $feed->id)->count();
     }
 

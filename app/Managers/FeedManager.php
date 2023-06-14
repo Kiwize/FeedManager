@@ -35,7 +35,7 @@ class FeedManager
 
         return $feed;
     }
-    
+
     /**
      * storeFeedAndAddArticles
      * Ajoute les flux et tous les articles associés.
@@ -49,19 +49,19 @@ class FeedManager
         try {
             $rssData = new RSSData($link);
             $newFeed = FeedManager::create($name, $link, $author_logo);
+
+            if (ArticleManager::createAllArticles($rssData, $newFeed->id) == false || is_null($newFeed)) {
+                return false;
+            } else {
+                $addedArticlesCount = Article::where('feed_id', '=', $newFeed->id)->count();
+            }
+
+            $addedArticlesLocale = Article::where('feed_id', '=', $newFeed->id)->select('locale')->get()->first();
+            $newFeed->locale = is_null($addedArticlesLocale) ? "" : $addedArticlesLocale->locale;
+            $newFeed->save();
         } catch (ErrorException $ex) {
             return false;
         }
-
-        if (ArticleManager::createAllArticles($rssData, $newFeed->id) == false || is_null($newFeed)) {
-            return false;
-        } else {
-            $addedArticlesCount = Article::where('feed_id', '=', $newFeed->id)->count();
-        }
-
-        $addedArticlesLocale = Article::where('feed_id', '=', $newFeed->id)->select('locale')->get()->first();
-        $newFeed->locale = is_null($addedArticlesLocale) ? "" : $addedArticlesLocale->locale;
-        $newFeed->save();
 
         return ['created_feed' => $newFeed, 'added_articles' => $addedArticlesCount, 'feed_locale' => $addedArticlesLocale];
     }
