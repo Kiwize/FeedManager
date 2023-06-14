@@ -32,7 +32,9 @@ class FeedUpdater
         foreach ($allFeedsLinks as $feed) {
             try {
                 $rssData = new RSSData($feed->link);
+                var_dump($rssData);
             } catch (ErrorException $ex) {
+                echo ($ex);
                 continue;
             }
 
@@ -48,13 +50,18 @@ class FeedUpdater
                 /** @var \App\Models\Article|null $article */
                 $article = Article::where('static_hash', '=', $feedHashedArticle['static_hash'])->first();
                 if (is_null($article) === true) {
-                    array_push($addedArticleArray, ArticleManager::getArticle(
+                    $article = ArticleManager::getArticle(
                         $rssData,
                         $i,
                         $feed->id
-                    )->toArray());
+                    );
 
-                    $addedArticles++;
+                    if (is_null($article) === false) {
+                        array_push($addedArticleArray, $article->toArray());
+
+                        $addedArticles++;
+                    }
+
                     continue;
                 }
 

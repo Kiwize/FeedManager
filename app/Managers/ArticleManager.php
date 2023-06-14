@@ -115,6 +115,10 @@ class ArticleManager
         return $newArticle;
     }
 
+    public static function countArticlesFromFeed(Feed $feed): int {
+        return Article::where('feed_id', '=', $feed->id)->count();
+    }
+
     /**
      * toJson
      * Convertit un article en un objet JSON compatible pour la MMI

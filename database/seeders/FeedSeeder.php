@@ -71,7 +71,7 @@ class FeedSeeder extends Seeder
         );
 
         foreach ($feeds as $feed) {
-            FeedManager::create($feed['name'], $feed['url'], $feed['logo']);
+            FeedManager::storeFeedAndAddArticles($feed['name'], $feed['url'], $feed['logo']);
         }
     }
 }

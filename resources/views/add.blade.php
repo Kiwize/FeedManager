@@ -17,12 +17,16 @@
             <div class=" form-sub-container p-4 rounded d-flex flex-column align-items-center">
                 @csrf
                 <div class="form-group w-100">
-                    <label for="name">Nom de la source (Entre 6 et 20 caractères)</label>
+                    <label for="name">Nom de la source (32 caractères maximum)</label>
                     <input type="text" id="name" name="name" class="form-control" required pattern="[a-zA-Z0-9]+" minlength="6" maxlength="20">
                 </div>
                 <div class="form-group w-100 mt-3">
                     <label for="link">URL de la source</label>
                     <input type="text" id="link" name="link" class="form-control" required>
+                </div>
+                <div class="form-group w-100 mt-3">
+                    <label for="link">URL de l'icône</label>
+                    <input type="text" id="author_logo" name="author_logo" class="form-control" required>
                 </div>
                 <div class="mt-3">
                     <button class="btn btn-danger" onclick="history.back()">Annuler</button>
