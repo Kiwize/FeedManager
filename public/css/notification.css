@@ -1,0 +1,16 @@
+.notification {
+    position: fixed;
+    top: -100px;
+    left: 0;
+    right: 0;
+    padding: 10px;
+    transition: top 0.5s;
+}
+
+.notification.slide-in {
+    top: 0;
+}
+
+.notification.slide-out {
+    top: -100px;
+}

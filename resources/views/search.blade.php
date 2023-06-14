@@ -1,3 +1,7 @@
+<?php
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,54 +10,84 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}" />
-    <link rel="stylesheet" type="text/css" href="<?php echo asset('css/search.css?v=') . time() ?>">
-    <link rel="stylesheet" type="text/css" href="<?php echo asset('css/navigation.css?v=') . time() ?>">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <title>Recherche</title>
 </head>
 
-<body>
-    <!--Articles retriever and updater scripts-->
+<body data-bs-theme="dark">
     <script type="text/javascript" src="<?php echo "js/articleManager.js" ?>"></script>
-
-    <header>
-        <h1>Rechercher un article</h1>
-        <nav>
-            <ul><a href="/">Accueil</a></ul>
-            <ul><a href="/search">Recherche</a></ul>
-            <ul><a href="/manager">Sources</a></ul>
-        </nav>
-        <div id="search_engine">
-            <label id="search_label" for="searchbar">Recherche > </label>
-            <input type="text" id="searchbar" name="searchbar">
-            <select name="filters" id="searchFiltersDropdown" onchange='getArticleList(document.getElementById("searchbar").value, document.getElementById("searchFiltersDropdown").value, getShowedPage());'>
-                <option value="newest" selected>Du plus récent au plus vieux</option>
-                <option value="oldest">Du plus vieux au plus récent</option>
-                <option value="alphabetTitle">Titre par ordre alphabétique</option>
-            </select>
-
-            <p id="dbStats"></p>
-            <!--Page selector on top of the main page-->
-            <div class="pageOverview" id="pageOverviewTop">
-                <button class="previousPageButton"></button>
-                <p class="pageCounter"></p>
-                <button class="nextPageButton"></button>
+    @include('header')
+    <div id="content">
+        <h2 class="h2 text-center mt-4">Les dernières parutions</h2>
+        <div>
+            <div class="text-center d-flex flex-row justify-content-center mx-auto mt-3 mb-4 pb-2 pt-2 w-50">
+            {!! $articles->appends(request()->query())->links() !!}
+            </div>
+            <div>
+                <form action="{{ route('articles.fetch') }}" method="get" class="d-flex flex-row justify-content-center">
+                    <div class=" form-group mx-2">
+                        <label class=" form-label lead">Langue : </label>
+                        <select class=" selector" name="localeFilter">
+                            <option value=" ">Tout</option>
+                            @foreach($locales as $locale)
+                            <option value="{{$locale->locale}}" {{ request('localeFilter') == $locale->locale ? 'selected' : '' }}>{{$locale->locale}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group mx-2">
+                        <label class=" form-label lead">Résultats par page : </label>
+                        <select class=" selector" name="resultsPerPage">
+                            <option value="20">20</option>
+                            <option value="75">75</option>
+                            <option value="100">100</option>
+                            <option value="200">200</option>
+                        </select>
+                    </div>
+                    <div class=" form-group mx-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
-    </header>
-
-    <p id="currentPage"></p>
-    <section class="page">
-        <div id="article_list"></div>
-    </section>
-
-
-    <!--Page selector at bottom of the main page-->
-    <div class="pageOverview" id="pageOverviewBottom">
-        <button class="previousPageButton"></button>
-        <p class="pageCounter"></p>
-        <button class="nextPageButton"></button>
+        <section class="page container d-flex flex-column justify-content-center">
+            <div id="article_list" class=" container">
+                <table class=" table table-responsive-md table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Titre</th>
+                            <th scope="col">Langue</th>
+                            <th scope="col">Date de publication</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="article_tab">
+                        @foreach($articles as $article)
+                        <tr>
+                            <th scope="row">{{ $article->id }}</th>
+                            <td class="lead">{{ $article->title}}</td>
+                            <td class="lead text-center">{{ strtoupper($article->locale) }}</td>
+                            <td>{{ $article->pubdate}}</td>
+                            <td><img src="{{$icon_feeds[$article->feed_id]}}"></td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <div class="text-center d-flex flex-row justify-content-center mx-auto mt-3 mb-4 pb-2 pt-2 w-50">
+            {!! $articles->appends(request()->query())->links() !!}
+        </div>
     </div>
+    <style>
+        img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+        }
+    </style>
 </body>
 
 </html>

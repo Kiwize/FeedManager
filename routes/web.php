@@ -1,7 +1,14 @@
 <?php
 
+use App\Config\Config;
+use App\Http\Controllers\Web\ArticleController;
+use App\Http\Controllers\Web\SearchController;
 use App\Managers\FeedUpdater;
+use App\Models\Feed;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\View\View;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,18 +21,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('home');
-});
+Route::get('/', [ArticleController::class, 'fetchLatest'])->name("articles.fetch");
 
-Route::get("/manager", function() {
-    return view('manager');
-});
+Route::get("/manager", [SearchController::class, 'search'])->name("feeds.search");
 
-Route::get("/add", function() {
+Route::get("/add", function () {
     return view('add');
-});
-
-Route::get("/search", function() {
-    return view("/search");
 });

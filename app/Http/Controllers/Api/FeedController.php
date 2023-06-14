@@ -11,12 +11,15 @@ use App\Managers\RSSData;
 use App\Models\Article;
 use App\Models\Feed;
 use App\Validations;
+use ErrorException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\View\View;
 
 class FeedController extends Controller
 {
@@ -25,10 +28,42 @@ class FeedController extends Controller
      *
      * @return JsonResponse
      * @method GET /api/feeds
+     * @method POST /api/feeds(string title_filter)
      */
-    public function fetch(): JsonResponse
+    public function fetch(Request $request): JsonResponse|View
     {
-        return response()->json(array('result' => Feed::paginate(Config::RESULTS_PER_PAGES)));
+        switch ($request->getMethod()) {
+            case "POST":
+                $validator = Validations::feedFetchSearchValidation($request);
+                if ($validator->getStatusCode() != Response::HTTP_OK) {
+                    return $validator;
+                }
+
+                $feeds = Feed::where('name', 'like', '%' . $request->nameFilter . '%')->where('locale', 'like', '%' . $request->localeFilter . '%')->paginate(Config::RESULTS_PER_PAGES);
+                $locales = Feed::select('locale')->where('locale', '!=', "")->distinct()->get();
+
+                return response()->json(['result' => $feeds, 'locales' => $locales]);
+
+            default:
+                if (isset($request->locale_filter)) {
+                    $feeds = FeedManager::getLocale($request->locale_filter)->paginate(3);
+                } else {
+                    $feeds = Feed::paginate(Feed::count());
+                }
+
+                $accessStatus = array();
+
+                foreach ($feeds as $feed) {
+                    try {
+                        $rssData = new RSSData($feed->link);
+                        $accessStatus[$feed->id] = array('readable' => $rssData !== "unknown", 'articles_found' => ArticleManager::countArticlesFromFeed($feed));
+                    } catch (ErrorException $ex) {
+                        $accessStatus[$feed->id] = array('readable' => false, 'articles_found' => 0);
+                    }
+                }
+
+                return response()->json(array('result' => $feeds, 'feed_status' => $accessStatus));
+        }
     }
 
     /**
@@ -63,21 +98,22 @@ class FeedController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        DB::beginTransaction();
         $validator = Validations::feedStoreValidation($request);
         if ($validator->getStatusCode() !== Response::HTTP_OK) {
             return $validator;
         }
 
         if (!FeedManager::exists($request->link)) {
-            $rssData = new RSSData($request->link);
-            $newFeed = FeedManager::create($request->name, $request->link);
-            if (ArticleManager::createAllArticles($rssData, $newFeed->id) == false) {
+            $created_content = FeedManager::storeFeedAndAddArticles($request->name, $request->link, $request->author_logo);
+
+            if($created_content === false) {
+                DB::rollBack();
                 return response()->json(['error' => 'Internal server error'], Response::HTTP_INTERNAL_SERVER_ERROR);
-            } else {
-                $addedArticles = Article::where('feed_id', '=', $newFeed->id)->count();
             }
 
-            return response()->json(['created_feed' => $newFeed, 'added_articles' => $addedArticles], Response::HTTP_CREATED);
+            DB::commit();
+            return response()->json($created_content, Response::HTTP_CREATED);
         } else {
             return response()->json(['error' => $request->link . ' is already registred.'], Response::HTTP_BAD_REQUEST);
         }

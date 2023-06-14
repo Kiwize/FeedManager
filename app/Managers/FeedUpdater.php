@@ -30,7 +30,12 @@ class FeedUpdater
         $startTime = microtime(true);
 
         foreach ($allFeedsLinks as $feed) {
-            $rssData = new RSSData($feed->link);
+            try {
+                $rssData = new RSSData($feed->link);
+            } catch (ErrorException $ex) {
+                echo ($ex);
+                continue;
+            }
 
             for ($i = 0; $i < $rssData->getArticleCount(); $i++) {
                 $rssArticle = $rssData->getArticle($i);
@@ -44,13 +49,18 @@ class FeedUpdater
                 /** @var \App\Models\Article|null $article */
                 $article = Article::where('static_hash', '=', $feedHashedArticle['static_hash'])->first();
                 if (is_null($article) === true) {
-                    array_push($addedArticleArray, ArticleManager::getArticle(
+                    $article = ArticleManager::getArticle(
                         $rssData,
                         $i,
                         $feed->id
-                    )->toArray());
+                    );
 
-                    $addedArticles++;
+                    if (is_null($article) === false) {
+                        array_push($addedArticleArray, $article->toArray());
+
+                        $addedArticles++;
+                    }
+
                     continue;
                 }
 

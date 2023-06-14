@@ -1,4 +1,4 @@
-FROM php:8.1-fpm AS php_fpm
+FROM php:8.2-fpm AS php_fpm
 
 LABEL MAINTAINER Alexandre ANDRE <a.andre@prohacktive.io>
 
@@ -28,7 +28,7 @@ RUN docker-php-ext-install pdo \
 COPY ./_config/php.ini /usr/local/etc/php/
 
 # Install xdebug
-RUN pecl install xdebug-3.1.1 && docker-php-ext-enable xdebug
+RUN pecl install xdebug && docker-php-ext-enable xdebug
 
 # Install pcov
 RUN pecl install pcov && docker-php-ext-enable pcov

@@ -36,14 +36,14 @@ class ArticleManagerTest extends TestCase
     }
 
     public function testToJSON() {
-        FeedManager::create("unit_test_feed_00", "https://inessential.com/feed.json");
+        FeedManager::create("unit_test_feed_00", "https://inessential.com/feed.json", null);
         $article = ArticleFactory::new()->count(1)->make()->first();
         assertIsArray(ArticleManager::toJson($article));
     }
 
     public function testCreateArticle() {
         $rssData = new RSSData("https://inessential.com/feed.json");
-        FeedManager::create("unit_test_feed_00", "https://inessential.com/feed.json");
+        FeedManager::create("unit_test_feed_00", "https://inessential.com/feed.json", null);
         assertTrue(ArticleManager::createArticle($rssData, 0, Feed::all()->first()->id));
         assertFalse(ArticleManager::createArticle($rssData, -1, Feed::all()->first()->id));
     }

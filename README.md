@@ -52,6 +52,12 @@ make build
 make up
 ```
 
+### Install dependencies with comoser
+
+```bash
+make composer-install
+```
+
 ### Initialize database
 
 ```bash
@@ -68,13 +74,7 @@ make ps
 ### Test it
 
 ```bash
-curl --location --request GET 'http://localhost:8082/health' \
-```
-
-### Create database
-
-```bash
-make db-init
+curl --location --request GET 'http://localhost:8700/' \
 ```
 
 ## Development tips

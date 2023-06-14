@@ -19,7 +19,7 @@ class ArticleControllerTest extends TestCase
     public function testFetch()
     {
         $response = $this->get('/api/articles');
-        $response->assertStatus(400);
+        $response->assertStatus(200);
 
         $response = $this->get('/api/articles?results=20&resultsPerPage=6&page=2');
         $response->assertStatus(200);

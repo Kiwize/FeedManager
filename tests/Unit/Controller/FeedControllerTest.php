@@ -12,6 +12,27 @@ class FeedControllerTest extends TestCase {
     public function testGetFeedList() {
         $response = $this->get("/api/feeds");
         $response->assertStatus(200);
+
+        $response = $this->get("/api/feeds?locale_filter=fr");
+        $response->assertStatus(200);
+
+        $response = $this->post("/api/feeds/search", []);
+
+        $response->assertStatus(200);
+
+        $response = $this->post("/api/feeds/search", [
+            'nameFilter' => "a",
+            "localeFilter" => "fr"
+        ]);
+
+        $response->assertStatus(200);
+
+        $response = $this->post("/api/feeds/search", [
+            'nameFilter' => "a",
+            "localeFilter" => "frsqd"
+        ]);
+
+        $response->assertStatus(400);
     }
 
     public function testDeleteFeed() {
@@ -31,23 +52,32 @@ class FeedControllerTest extends TestCase {
     }
 
     public function testAddFeed() {
-        $response = $this->put("/api/feeds/create", []);
+        $response = $this->post("/api/feeds/create", []);
         $response->assertStatus(400);
 
-        $response = $this->put("/api/feeds/create", [
+        $response = $this->post("/api/feeds/create", [
             'name' => 'unit_test_feed_00',
             'link' => 'https://inessential.com/feed.json'
         ]);
         
-        $response->assertStatus(400);
+        $response->assertStatus(201);
 
         Feed::where('link', '=', 'https://inessential.com/feed.json')->delete();
 
-        $response = $this->put("/api/feeds/create", [
+        $response = $this->post("/api/feeds/create", [
             'name' => 'unit_test_feed_00',
-            'link' => 'https://inessential.com/feed.json'
+            'link' => 'https://inessential.com/feed.json',
+            'author_logo' => 'https://inessential.com/feed.json'
         ]);
 
         $response->assertStatus(201);
+
+        $response = $this->post("/api/feeds/create", [
+            'name' => 'unit_test_feed_00',
+            'link' => 'https://inessential.com/feed.json',
+            'author_logo' => 'https://inessential.com/feed.json'
+        ]);
+
+        $response->assertStatus(400);
     }
 }

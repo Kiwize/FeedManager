@@ -1,35 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="<?php echo asset('css/add.css?v=').time()?>">
-    <link rel="stylesheet" type="text/css" href="<?php echo asset('css/navigation.css?v=').time()?>">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <title>Ajouter une source</title>
 </head>
-    <body>
-        <header>
-            <h1>Ajouter une nouvelle source</h1>
-            <nav>
-                <ul><a href="/">Accueil</a></ul>
-                <ul><a href="/search">Recherche</a></ul>
-                <ul><a href="/manager">Sources</a></ul>
-            </nav>
-        </header>
-        <section>
-            <form method="POST" action="/feed-add-request">
+
+<body data-bs-theme="dark">
+    @include('header')
+
+    <section class=" m-lg-3">
+        <div class="container d-flex flex-column align-items-center">
+            <div class=" form-sub-container p-4 rounded d-flex flex-column align-items-center">
                 @csrf
-                <div>
-                    <label for="name">Nom de la source (Entre 6 et 20 caractères)</label>
-                    <input type="text" id="name" name="name" required pattern="[a-zA-Z0-9]+" minlength="6" maxlength="20">
+                <div class="form-group w-100">
+                    <label for="name">Nom de la source (32 caractères maximum)</label>
+                    <input type="text" id="name" name="name" class="form-control" required pattern="[a-zA-Z0-9]+" minlength="6" maxlength="20">
                 </div>
-                <div>
+                <div class="form-group w-100 mt-3">
                     <label for="link">URL de la source</label>
-                    <input type="text" id="link" name="link" required>
+                    <input type="text" id="link" name="link" class="form-control" required>
                 </div>
-                <input id="submit_button" type="submit" value="Ajouter">
-            </form>
-        </section>
-    </body>
+                <div class="form-group w-100 mt-3">
+                    <label for="link">URL de l'icône</label>
+                    <input type="text" id="author_logo" name="author_logo" class="form-control" required>
+                </div>
+                <div class="mt-3">
+                    <button class="btn btn-danger" onclick="history.back()">Annuler</button>
+                    <button id="submit_button" onclick="submitForm();" class="btn btn-primary">Ajouter</button>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script>
+        function submitForm() {
+            showLoadingScreen();
+            $.ajax({
+                url: '/api/feeds/create',
+                type: "POST",
+                data: {
+                    name: $('#name').val(),
+                    link: $('#link').val()
+                },
+                error: function(err) {
+                    hideLoadingScreen();
+                    showErrorNotification(err.responseJSON);
+                },
+                success: function() {
+                    hideLoadingScreen();
+                    window.location.replace('/manager');
+                    showSuccessNotification("Flux ajouté avec succès !");
+                }
+            });
+        }
+    </script>
+    <style>
+        .form-sub-container {
+            background-color: #313539;
+        }
+    </style>
+</body>
+
 </html>

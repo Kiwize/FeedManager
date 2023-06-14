@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Managers\ArticleManager;
 use App\Managers\FeedUpdater;
 use App\Models\Article;
+use App\Models\Feed;
 use App\Validations;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -52,7 +53,7 @@ class ArticleController extends Controller
                 if ($validator->getStatusCode() !== Response::HTTP_OK) {
                     return $validator;
                 }
-                $latestArticles = Article::latest()->limit($request->results)->get();
+                $latestArticles = Article::orderBy('pubdate', 'DESC')->limit($request->results)->get();
                 $articles = tap($latestArticles->paginate($rpp), function ($paginatedInstance) {
                     return $paginatedInstance->getCollection()->transform(function ($value) {
                         $value = ArticleManager::toJson($value);
@@ -66,13 +67,19 @@ class ArticleController extends Controller
     
     /**
      * listAvailableLocales
-     *
+     * List all feeds and their locales
      * @return JsonResponse
      * @method GET /api/articles/locales
      */
     public function listAvailableLocales(): JsonResponse {
-        $locales = Article::select('locale')->distinct()->get();
-        return response()->json($locales);
+        $feeds = Feed::select('id')->get();
+        $feedsLocales = array();
+
+        foreach($feeds as $feed) {
+            $feedsLocales[$feed->id] = Article::where('feed_id', '=', $feed->id)->select('locale')->first() === null ?  "undetermined" : Article::where('feed_id', '=', $feed->id)->select('locale')->first()["locale"];
+        }
+
+        return response()->json($feedsLocales);
     }
     
     /**
