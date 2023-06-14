@@ -73,7 +73,7 @@ composer-install: ## Composer install
 db-init: ## Initialize database (reset, migrate and seed)
 	@docker exec -ti news-feed-php-fpm bash -c 'php artisan migrate:refresh'
 	@docker exec -ti news-feed-php-fpm bash -c 'php artisan migrate'
-	@docker exec -ti news-feed-php-fpm bash -c 'php artisan migrate:refresh --seed'
+	@docker exec -ti news-feed-php-fpm bash -c 'composer run-script test:feeddbseed'
 
 .PHONY: docker-bash
 docker-bash: #Run bash in the PHP Docker
@@ -91,7 +91,3 @@ test: ## Make tests
 .PHONY: test-coverage
 test-coverage: ## Make tests
 	@docker exec -ti news-feed-php-fpm bash -c 'composer run-script test:coverage'
-
-.PHONY: test-feeddbseed
-feeddbseed: ##DB Seeding for testing
-	@docker exec -ti news-feed-php-fpm bash -c 'composer run-script test:feeddbseed'
