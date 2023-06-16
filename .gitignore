@@ -26,3 +26,6 @@ Homestead.json
 /.vagrant
 .phpunit.result.cache
 storage/logs/
+
+*.phpunit
+*.phpunit*

@@ -34,10 +34,6 @@ class HashManager
      */
     public function hashRSSFile(string $url): ?string
     {
-        try {
-            return hash("sha256", file_get_contents($url));
-        } catch (Exception $ex) {
-            return null;
-        }
+        return hash("sha256", file_get_contents($url));
     }
 }
