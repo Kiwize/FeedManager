@@ -1,6 +1,7 @@
 <?php
 
 use App\Config\Config;
+use App\Http\Controllers\EmailController;
 use App\Http\Controllers\Web\ArticleController;
 use App\Http\Controllers\Web\SearchController;
 use App\Managers\FeedUpdater;
@@ -28,3 +29,5 @@ Route::get("/manager", [SearchController::class, 'search'])->name("feeds.search"
 Route::get("/add", function () {
     return view('add');
 });
+
+

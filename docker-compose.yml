@@ -56,6 +56,15 @@ services:
     networks:
       - news-feed-network
 
+  mail-testing:
+    image: axllent/mailpit:v1.6
+    container_name: news-feed-mail-testing
+    ports:
+      - 1025:1025 # smtp server
+      - 8025:8025 # web ui
+    networks:
+      - news-feed-network
+
 networks:
   news-feed-network:
     driver: bridge

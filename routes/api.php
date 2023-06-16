@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\ArticleController;
 use App\Http\Controllers\Api\FeedController;
+use App\Http\Controllers\EmailController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -33,3 +34,4 @@ Route::get("feeds", [FeedController::class, 'fetch']);
 Route::post("feeds/search", [FeedController::class, 'fetch']);
 Route::post('feeds/create', [FeedController::class, 'store']);
 Route::delete("feeds/delete", [FeedController::class, 'delete']);
+Route::post('/feeds/add-request', [EmailController::class, 'index']);
