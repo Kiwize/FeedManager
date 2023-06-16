@@ -29,7 +29,7 @@
                     <input type="text" id="author_logo" name="author_logo" class="form-control" required>
                 </div>
                 <div class="mt-3">
-                    <button class="btn btn-danger" onclick="history.back()">Annuler</button>
+                    <button class="btn btn-danger" onclick="window.location.replace('/sources');">Annuler</button>
                     <button id="submit_button" onclick="submitForm();" class="btn btn-primary">Ajouter</button>
                 </div>
             </div>
@@ -51,7 +51,7 @@
                 },
                 success: function() {
                     hideLoadingScreen();
-                    window.location.replace('/manager');
+                    window.location.replace('/sources');
                     showSuccessNotification("Flux ajouté avec succès !");
                 }
             });

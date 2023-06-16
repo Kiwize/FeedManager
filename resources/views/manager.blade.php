@@ -22,14 +22,14 @@ use App\Http\Controllers\FeedsController;
     @include('header')
     <div class="row justify-content-center">
         <div class="rounded-pill p-2 d-flex flex-row justify-content-center buttons-container mt-md-3">
-            <button id="add_button" class="btn btn-primary" onclick="window.location.replace('/add');">Ajouter</button>
+            <button id="add_button" class="btn btn-primary" onclick="window.location.replace('/feed_add_request');">Ajouter</button>
         </div>
 
     </div>
     <div class="">
         {{ csrf_field() }}
         <div class="input-group d-flex flex-row justify-content-lg-around mt-lg-4">
-            <form class="form-inline" action="{{ route('feeds.search') }}" method="GET">
+            <form class="form-inline" action="{{ route('sources') }}" method="GET">
                 <div class="d-flex flex-row justify-content-center">
                     <label for="nameFilter" class="lead form-label">Rechercher : </label>
                     <div class="form-group mx-2">

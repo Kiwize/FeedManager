@@ -18,7 +18,7 @@
         </figure>
         <nav class=" round flex-sm-row d-flex justify-content-center">
             <ul class="p-0 mx-2"><a class="lead text-white" href="/">Accueil</a></ul>
-            <ul class="p-0 mx-2"><a class="lead text-white" href="/manager">Sources</a></ul>
+            <ul class="p-0 mx-2"><a class="lead text-white" href="/sources">Sources</a></ul>
         </nav>
         <div id="notification-container"></div>
     </header>

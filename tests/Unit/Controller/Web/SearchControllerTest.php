@@ -8,13 +8,13 @@ class SearchControllerTest extends TestCase
 {
     public function testSearch() {
 
-        $response = $this->get('/manager');
+        $response = $this->get('/sources');
         $response->assertStatus(200);
 
-        $response = $this->get('/manager?nameFilter=a&localeFilter=fr');
+        $response = $this->get('/sources?nameFilter=a&localeFilter=fr');
         $response->assertStatus(200);
 
-        $response = $this->get('/manager?nameFilter=lol&localeFilter=zboob');
+        $response = $this->get('/sources?nameFilter=lol&localeFilter=zboob');
         $response->assertStatus(400);
     }
 }
