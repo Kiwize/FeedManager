@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Mail</title>
+    <title>Feed add request from {{$feedData['user_uuid']}}</title>
 </head>
 <body>
     <figure>

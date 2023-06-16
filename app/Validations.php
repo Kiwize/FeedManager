@@ -9,6 +9,18 @@ use Illuminate\Support\Facades\Validator;
 
 class Validations
 {
+    public static function feedSuggestMailValidation(Request $request): JsonResponse {
+        $validator = Validator::make($request->all(), [
+            'feed_link' => 'url'
+        ]);
+
+        if($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
+        }
+
+        return response()->json();
+    }
+
     public static function feedSearchValidation(Request $request): JsonResponse {
         $validator = Validator::make($request->all(), [
             'nameFilter' => 'regex:/^[a-bA-B0-9 ]+$/',
