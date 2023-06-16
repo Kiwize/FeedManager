@@ -28,4 +28,4 @@ Homestead.json
 storage/logs/
 
 *.phpunit
-.phpunit*
+*.phpunit*

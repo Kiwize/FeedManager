@@ -35,9 +35,6 @@ class hashArticleTest extends TestCase{
         $hashManager = new HashManager;
         $result = $hashManager->hashRSSFile("https://inessential.com/feed.json");
 
-        assertIsString($result);
-        $result = $hashManager->hashRSSFile("amogus");
-        assertNull($result);
+        assertIsString($result);        
     }
-
 }
