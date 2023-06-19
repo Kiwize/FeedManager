@@ -4,8 +4,11 @@
   "editor.insertSpaces": true,
   "editor.trimAutoWhitespace": true,
   "editor.renderFinalNewline": "on",
-  "[php]":{
+  "[php]": {
     "editor.defaultFormatter": "bmewburn.vscode-intelephense-client",
   },
-  "php.executablePath": "~/.asdf/shims/php"
+  "[xml]": {
+    "editor.defaultFormatter": "redhat.vscode-xml"
+  },
+  "php.executablePath": "~/.asdf/shims/php",
 }
