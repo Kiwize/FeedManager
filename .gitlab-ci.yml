@@ -24,6 +24,10 @@ cache: &global_cache
 .update_apt_system:
   script:
     - DEBIAN_FRONTEND=noninteractive apt-get -yqq update
+    - DEBIAN_FRONTEND=noninteractive apt-get install -yqq lsb-release apt-transport-https ca-certificates software-properties-common wget gnupg gnupg2
+    - echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main"\ | tee /etc/apt/sources.list.d/sury-php.list
+    - wget -qO - https://packages.sury.org/php/apt.gpg | apt-key add -
+    - DEBIAN_FRONTEND=noninteractive apt-get -yqq update
 
 .setup_custom_target_identity:
   script:
