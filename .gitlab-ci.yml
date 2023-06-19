@@ -1,327 +1,327 @@
 # Standard include for ProHacktive projects
 include:
-  - project: "developper/boilerplates/gitlab-templates"
-    ref: master
-    file: "/gitlab-ci/PROHACKTIVE.yml"
+    - project: "developper/boilerplates/gitlab-templates"
+      ref: master
+      file: "/gitlab-ci/PROHACKTIVE.yml"
 
 variables:
-  PHP_APT_PACKAGE_SYSTEM: "pkg-config git curl zip unzip wget gcc make autoconf libc-dev libmcrypt-dev"
-  PHP_COMPOSER_VERSION: "2.2.4"
-  PHP_VERSION: "8.1"
-  TARGET_SERVER_DIRECTORY: "/var/www/news-feed-api"
+    PHP_APT_PACKAGE_SYSTEM: "pkg-config git curl zip unzip wget gcc make autoconf libc-dev libmcrypt-dev"
+    PHP_COMPOSER_VERSION: "2.2.4"
+    PHP_VERSION: "8.1"
+    TARGET_SERVER_DIRECTORY: "/var/www/news-feed-api"
 
 # Global shared cache
 cache: &global_cache
-  untracked: true
-  key:
-    files:
-      - composer.phar
-    prefix: $CI_COMMIT_REF_SLUG
-  paths:
-    - vendor/
-  policy: pull-push
+    untracked: true
+    key:
+        files:
+            - composer.phar
+        prefix: $CI_COMMIT_REF_SLUG
+    paths:
+        - vendor/
+    policy: pull-push
 
 .update_apt_system:
-  script:
-    - DEBIAN_FRONTEND=noninteractive apt-get -yqq update
-    - DEBIAN_FRONTEND=noninteractive apt-get install -yqq lsb-release apt-transport-https ca-certificates software-properties-common wget gnupg gnupg2
-    - echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main"\ | tee /etc/apt/sources.list.d/sury-php.list
-    - wget -qO - https://packages.sury.org/php/apt.gpg | apt-key add -
-    - DEBIAN_FRONTEND=noninteractive apt-get -yqq update
+    script:
+        - DEBIAN_FRONTEND=noninteractive apt-get -yqq update
+        - DEBIAN_FRONTEND=noninteractive apt-get install -yqq lsb-release apt-transport-https ca-certificates software-properties-common wget gnupg gnupg2
+        - echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main"\ | tee /etc/apt/sources.list.d/sury-php.list
+        - wget -qO - https://packages.sury.org/php/apt.gpg | apt-key add -
+        - DEBIAN_FRONTEND=noninteractive apt-get -yqq update
 
 .setup_custom_target_identity:
-  script:
-    - !reference [set_vars, before_script]
-    - !reference [.update_system, before_script]
-    - !reference [.setup_private_identity, before_script]
-    - echo "[+] Discover ${TARGET_SERVER} public key from network"
-    - ssh-keyscan ${TARGET_SERVER} >> ~/.ssh/known_hosts
+    script:
+        - !reference [set_vars, before_script]
+        - !reference [.update_system, before_script]
+        - !reference [.setup_private_identity, before_script]
+        - echo "[+] Discover ${TARGET_SERVER} public key from network"
+        - ssh-keyscan ${TARGET_SERVER} >> ~/.ssh/known_hosts
 
 .install_php_program:
-  script:
-    - if [ -f .php.dependencies.phk ]; then INSTALL_PACKETS=$(readarray -t ARRAY < .php.dependencies.phk; IFS=' '; echo "${ARRAY[*]}"); else INSTALL_PACKETS=""; fi
-    - DEBIAN_FRONTEND=noninteractive apt-get install -yqq ${PHP_APT_PACKAGE_SYSTEM} ${INSTALL_PACKETS}
+    script:
+        - if [ -f .php.dependencies.phk ]; then INSTALL_PACKETS=$(readarray -t ARRAY < .php.dependencies.phk; IFS=' '; echo "${ARRAY[*]}"); else INSTALL_PACKETS=""; fi
+        - DEBIAN_FRONTEND=noninteractive apt-get install -yqq ${PHP_APT_PACKAGE_SYSTEM} ${INSTALL_PACKETS}
 
 .install_php_extensions:
-  script:
-    - pear config-set php_ini /etc/php/${PHP_VERSION}/cli/php.ini
-    - echo "[+] Update php code coverage extension"
-    - pecl install pcov
-    - pecl install mcrypt
+    script:
+        - pear config-set php_ini /etc/php/${PHP_VERSION}/cli/php.ini
+        - echo "[+] Update php code coverage extension"
+        - pecl install pcov
+        - pecl install mcrypt
 
 .install_php_composer:
-  script:
-    - wget https://composer.github.io/installer.sig -O - -q | tr -d '\n' > installer.sig
-    - php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-    - php -r "if (hash_file('SHA384', 'composer-setup.php') === file_get_contents('installer.sig')) { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
-    - php composer-setup.php --version=${PHP_COMPOSER_VERSION}
-    - php -r "unlink('composer-setup.php'); unlink('installer.sig');"
+    script:
+        - wget https://composer.github.io/installer.sig -O - -q | tr -d '\n' > installer.sig
+        - php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+        - php -r "if (hash_file('SHA384', 'composer-setup.php') === file_get_contents('installer.sig')) { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+        - php composer-setup.php --version=${PHP_COMPOSER_VERSION}
+        - php -r "unlink('composer-setup.php'); unlink('installer.sig');"
 
 .install_nodejs:
-  script:
-    - DEBIAN_FRONTEND=noninteractive apt-get install -yqq ${PHP_APT_PACKAGE_SYSTEM}
-    - curl -sL https://deb.nodesource.com/setup_16.x | bash
-    - DEBIAN_FRONTEND=noninteractive apt-get install -yqq nodejs
+    script:
+        - DEBIAN_FRONTEND=noninteractive apt-get install -yqq ${PHP_APT_PACKAGE_SYSTEM}
+        - curl -sL https://deb.nodesource.com/setup_16.x | bash
+        - DEBIAN_FRONTEND=noninteractive apt-get install -yqq nodejs
 
 .configure_php_composer_dependencies:
-  script:
-    - php composer.phar install
-    # - php composer.phar run-script development:extract-deps-archive
+    script:
+        - php composer.phar install
+        # - php composer.phar run-script development:extract-deps-archive
 
 .configure_laravel_mix_dependencies:
-  script:
-    - !reference [.install_nodejs, script]
-    - npm i
-    - npm run production
+    script:
+        - !reference [.install_nodejs, script]
+        - npm i
+        - npm run production
 
 .configure_env_dotfile:
-  script:
-    - cp .env.example .env
-    - sed -i "s/^DB_CONNECTION=.*/DB_CONNECTION=sqlite/" .env
-    - sed -i "s/^DB_DATABASE=.*/DB_DATABASE=\"database\/database.sqlite\"/" .env
+    script:
+        - cp .env.example .env
+        - sed -i "s/^DB_CONNECTION=.*/DB_CONNECTION=sqlite/" .env
+        - sed -i "s/^DB_DATABASE=.*/DB_DATABASE=\"database\/database.sqlite\"/" .env
 
 .configure_application_database:
-  script:
-    - touch database/database.sqlite
-    - php artisan migrate --force --no-interaction
-    - php artisan db:seed --force --no-interaction
+    script:
+        - touch database/database.sqlite
+        - php artisan migrate --force --no-interaction
+        - php artisan db:seed --force --no-interaction
 
 .configure_application_environment:
-  script:
-    - ssh lord@${TARGET_SERVER} "mkdir -p ${TARGET_SERVER_DIRECTORY}"
-    - ssh lord@${TARGET_SERVER} "mkdir -p ${TARGET_SERVER_DIRECTORY}/storage/framework/sessions"
-    - ssh lord@${TARGET_SERVER} "mkdir -p ${TARGET_SERVER_DIRECTORY}/storage/framework/cache"
-    - ssh lord@${TARGET_SERVER} "mkdir -p ${TARGET_SERVER_DIRECTORY}/bootstrap/cache"
-    - ssh lord@${TARGET_SERVER} "if [ ! -f ${TARGET_SERVER_DIRECTORY}/.env ]; then cp ${TARGET_SERVER_DIRECTORY}/.env.example ${TARGET_SERVER_DIRECTORY}/.env; fi"
-    - ssh lord@${TARGET_SERVER} "composer install --working-dir=${TARGET_SERVER_DIRECTORY} --no-ansi --no-dev --no-interaction --no-plugins --no-progress --no-scripts --no-suggest --optimize-autoloader"
-    - ssh lord@${TARGET_SERVER} "composer dump-autoload --working-dir=${TARGET_SERVER_DIRECTORY}"
-    - ssh lord@${TARGET_SERVER} "sudo /bin/chown -R lord.www-data ${TARGET_SERVER_DIRECTORY}/bootstrap/cache"
-    - ssh lord@${TARGET_SERVER} "sudo /bin/chown -R lord.www-data ${TARGET_SERVER_DIRECTORY}/storage"
-    - ssh lord@${TARGET_SERVER} "php ${TARGET_SERVER_DIRECTORY}/artisan optimize:clear"
-    # - ssh lord@${TARGET_SERVER} "php ${TARGET_SERVER_DIRECTORY}/artisan config:cache" # need to disable this command in production temporarily because of proxy
-    - ssh lord@${TARGET_SERVER} "php ${TARGET_SERVER_DIRECTORY}/artisan migrate --no-interaction --force"
-    - ssh lord@${TARGET_SERVER} "php ${TARGET_SERVER_DIRECTORY}/artisan db:seed --no-interaction --force"
-    - ssh lord@${TARGET_SERVER} "php ${TARGET_SERVER_DIRECTORY}/artisan storage:link"
-    # - ssh lord@${TARGET_SERVER} "php ${TARGET_SERVER_DIRECTORY}/artisan optimize" # need to disable this command in production temporarily because of proxy
-    - ssh lord@${TARGET_SERVER} "php ${TARGET_SERVER_DIRECTORY}/artisan up"
-    - ssh lord@${TARGET_SERVER} "sudo /bin/chmod -R 775 ${TARGET_SERVER_DIRECTORY}/bootstrap/cache"
-    - ssh lord@${TARGET_SERVER} "sudo /bin/chmod -R 775 ${TARGET_SERVER_DIRECTORY}/storage"
+    script:
+        - ssh lord@${TARGET_SERVER} "mkdir -p ${TARGET_SERVER_DIRECTORY}"
+        - ssh lord@${TARGET_SERVER} "mkdir -p ${TARGET_SERVER_DIRECTORY}/storage/framework/sessions"
+        - ssh lord@${TARGET_SERVER} "mkdir -p ${TARGET_SERVER_DIRECTORY}/storage/framework/cache"
+        - ssh lord@${TARGET_SERVER} "mkdir -p ${TARGET_SERVER_DIRECTORY}/bootstrap/cache"
+        - ssh lord@${TARGET_SERVER} "if [ ! -f ${TARGET_SERVER_DIRECTORY}/.env ]; then cp ${TARGET_SERVER_DIRECTORY}/.env.example ${TARGET_SERVER_DIRECTORY}/.env; fi"
+        - ssh lord@${TARGET_SERVER} "composer install --working-dir=${TARGET_SERVER_DIRECTORY} --no-ansi --no-dev --no-interaction --no-plugins --no-progress --no-scripts --no-suggest --optimize-autoloader"
+        - ssh lord@${TARGET_SERVER} "composer dump-autoload --working-dir=${TARGET_SERVER_DIRECTORY}"
+        - ssh lord@${TARGET_SERVER} "sudo /bin/chown -R lord.www-data ${TARGET_SERVER_DIRECTORY}/bootstrap/cache"
+        - ssh lord@${TARGET_SERVER} "sudo /bin/chown -R lord.www-data ${TARGET_SERVER_DIRECTORY}/storage"
+        - ssh lord@${TARGET_SERVER} "php ${TARGET_SERVER_DIRECTORY}/artisan optimize:clear"
+        # - ssh lord@${TARGET_SERVER} "php ${TARGET_SERVER_DIRECTORY}/artisan config:cache" # need to disable this command in production temporarily because of proxy
+        - ssh lord@${TARGET_SERVER} "php ${TARGET_SERVER_DIRECTORY}/artisan migrate --no-interaction --force"
+        - ssh lord@${TARGET_SERVER} "php ${TARGET_SERVER_DIRECTORY}/artisan db:seed --no-interaction --force"
+        - ssh lord@${TARGET_SERVER} "php ${TARGET_SERVER_DIRECTORY}/artisan storage:link"
+        # - ssh lord@${TARGET_SERVER} "php ${TARGET_SERVER_DIRECTORY}/artisan optimize" # need to disable this command in production temporarily because of proxy
+        - ssh lord@${TARGET_SERVER} "php ${TARGET_SERVER_DIRECTORY}/artisan up"
+        - ssh lord@${TARGET_SERVER} "sudo /bin/chmod -R 775 ${TARGET_SERVER_DIRECTORY}/bootstrap/cache"
+        - ssh lord@${TARGET_SERVER} "sudo /bin/chmod -R 775 ${TARGET_SERVER_DIRECTORY}/storage"
 
 .restart_server_web_services:
-  script:
-    - ssh lord@${TARGET_SERVER} "sudo /bin/systemctl restart php${PHP_VERSION}-fpm.service"
-    - ssh lord@${TARGET_SERVER} "sudo /bin/systemctl restart nginx.service"
+    script:
+        - ssh lord@${TARGET_SERVER} "sudo /bin/systemctl restart php${PHP_VERSION}-fpm.service"
+        - ssh lord@${TARGET_SERVER} "sudo /bin/systemctl restart nginx.service"
 
 .deploy_application:
-  needs:
-    - test:php
-  script:
-    - echo "[+] Deploy application into testing (${CI_ENVIRONMENT_NAME}) - (${TARGET_SERVER}) environment"
-    - !reference [.setup_custom_target_identity, script]
-    - !reference [.configure_laravel_mix_dependencies, script]
-    - mkdir -p /tmp/output
-    - cp -r app bootstrap config database public resources routes storage .env.example composer.json composer.lock server.php artisan /tmp/output
-    - ssh lord@${TARGET_SERVER} "ls -al ${TARGET_SERVER_DIRECTORY}"
-    - scp -rp /tmp/output/* lord@${TARGET_SERVER}:${TARGET_SERVER_DIRECTORY}
-    - !reference [.configure_application_environment, script]
-    - !reference [.restart_server_web_services, script]
+    needs:
+        - test:php
+    script:
+        - echo "[+] Deploy application into testing (${CI_ENVIRONMENT_NAME}) - (${TARGET_SERVER}) environment"
+        - !reference [.setup_custom_target_identity, script]
+        - !reference [.configure_laravel_mix_dependencies, script]
+        - mkdir -p /tmp/output
+        - cp -r app bootstrap config database public resources routes storage .env.example composer.json composer.lock server.php artisan /tmp/output
+        - ssh lord@${TARGET_SERVER} "ls -al ${TARGET_SERVER_DIRECTORY}"
+        - scp -rp /tmp/output/* lord@${TARGET_SERVER}:${TARGET_SERVER_DIRECTORY}
+        - !reference [.configure_application_environment, script]
+        - !reference [.restart_server_web_services, script]
 
 # Commit lint
 prepare:commitlint:
-  stage: prepare
-  image: node:16
-  rules:
-    - if: ($CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == $DEVELOP_BRANCH) || ($CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH)
-      allow_failure: true
-    - when: always
-  script:
-    - npm install -g @commitlint/cli @commitlint/config-conventional
-    - "echo \"module.exports = {extends: ['@commitlint/config-conventional']}\" > commitlint.config.js"
-    - echo "${CI_COMMIT_TITLE}\n\n${CI_COMMIT_DESCRIPTION}" | commitlint
+    stage: prepare
+    image: node:16
+    rules:
+        - if: ($CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == $DEVELOP_BRANCH) || ($CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH)
+          allow_failure: true
+        - when: always
+    script:
+        - npm install -g @commitlint/cli @commitlint/config-conventional
+        - 'echo "module.exports = {extends: [''@commitlint/config-conventional'']}" > commitlint.config.js'
+        - echo "${CI_COMMIT_TITLE}\n\n${CI_COMMIT_DESCRIPTION}" | commitlint
 
 # Install PHP composer library
 prepare:php:
-  extends: .commit
-  stage: prepare
-  needs:
-    - set_vars
-    - prepare:commitlint
-  rules:
-    - exists: # Only affect composer projects
-        - composer.json
-        - composer.lock
-  script:
-    - echo "[prepare:php] Nothing to prepare"
+    extends: .commit
+    stage: prepare
+    needs:
+        - set_vars
+        - prepare:commitlint
+    rules:
+        - exists: # Only affect composer projects
+              - composer.json
+              - composer.lock
+    script:
+        - echo "[prepare:php] Nothing to prepare"
 
 # Install PHP composer dependencies
 build:php:
-  extends: .commit
-  stage: build
-  needs:
-    - set_vars
-    - prepare:php
-  # image: debian:buster # use debian buster image instead of php image else it will throw error about apt packages not found.
-  image: debian:bullseye
-  rules:
-    - exists: # Only affect composer projects
-        - composer.json
-        - composer.lock
-  script:
-    - echo "[build:php] Nothing to build"
+    extends: .commit
+    stage: build
+    needs:
+        - set_vars
+        - prepare:php
+    # image: debian:buster # use debian buster image instead of php image else it will throw error about apt packages not found.
+    image: debian:bullseye
+    rules:
+        - exists: # Only affect composer projects
+              - composer.json
+              - composer.lock
+    script:
+        - echo "[build:php] Nothing to build"
 
 # Test PHP project
 test:php:
-  extends: .commit
-  stage: test
-  needs:
-    - build:php
-  # image: debian:buster # use debian buster image instead of php image else it will throw error about apt packages not found.
-  image: debian:bullseye
-  rules:
-    - exists: # Only affect composer projects
-        - composer.json
-        - composer.lock
-        - composer.phar
-        - vendor # Ensure vendor directory exists
-      when: on_success
-  cache:
-    # inherit all global cache settings
-    <<: *global_cache
-  before_script:
-    - !reference [.update_apt_system, script]
-    - !reference [.install_php_program, script]
-    - !reference [.install_php_extensions, script]
-    - !reference [.install_php_composer, script]
-    - !reference [.configure_php_composer_dependencies, script]
-    - !reference [.configure_env_dotfile, script]
-    - !reference [.configure_application_database, script]
-    - !reference [.configure_laravel_mix_dependencies, script]
-  script:
-    - php -m
-    - php -i
-    - ls -al ./
-    - echo "[+] Running unit tests on project."
-    - php artisan key:generate
-    - php ./vendor/bin/phpunit --coverage-html coverage
-    # - php artisan test --coverage # @version >=9.x
-  artifacts:
-    expose_as: 'PHP test job'
-    paths: ['coverage/', '.env']
+    extends: .commit
+    stage: test
+    needs:
+        - build:php
+    # image: debian:buster # use debian buster image instead of php image else it will throw error about apt packages not found.
+    image: debian:bullseye
+    rules:
+        - exists: # Only affect composer projects
+              - composer.json
+              - composer.lock
+              - composer.phar
+              - vendor # Ensure vendor directory exists
+          when: on_success
+    cache:
+        # inherit all global cache settings
+        <<: *global_cache
+    before_script:
+        - !reference [.update_apt_system, script]
+        - !reference [.install_php_program, script]
+        - !reference [.install_php_extensions, script]
+        - !reference [.install_php_composer, script]
+        - !reference [.configure_php_composer_dependencies, script]
+        - !reference [.configure_env_dotfile, script]
+        - !reference [.configure_application_database, script]
+        - !reference [.configure_laravel_mix_dependencies, script]
+    script:
+        - php -m
+        - php -i
+        - ls -al ./
+        - echo "[+] Running unit tests on project."
+        - php artisan key:generate
+        - php ./vendor/bin/phpunit --coverage-html coverage
+        # - php artisan test --coverage # @version >=9.x
+    artifacts:
+        expose_as: "PHP test job"
+        paths: ["coverage/", ".env"]
 
 # Generate PHP documentation
 doc:php:
-  extends: .commit
-  stage: test
-  needs:
-    - test:php
-  image: debian:bullseye
-  rules:
-    - exists: # Only affect php projects
-        - composer.json
-        - composer.phar # Ensure composer.phar exists
-      when: on_success
-      allow_failure: true
-  cache:
-    # inherit all global cache settings
-    <<: *global_cache
-  before_script:
-    - !reference [.update_apt_system, script]
-    - !reference [.install_php_program, script]
-    - !reference [.install_php_extensions, script]
-    - !reference [.install_php_composer, script]
-    - !reference [.configure_php_composer_dependencies, script]
-    - !reference [.configure_env_dotfile, script]
-  script:
-    - echo "[+] Create PHP technical documentation"
-    - php composer.phar run-script docs:make
-  artifacts:
-    expose_as: 'PHP docs job'
-    paths: ['docs/.build/', '.env']
+    extends: .commit
+    stage: test
+    needs:
+        - test:php
+    image: debian:bullseye
+    rules:
+        - exists: # Only affect php projects
+              - composer.json
+              - composer.phar # Ensure composer.phar exists
+          when: on_success
+          allow_failure: true
+    cache:
+        # inherit all global cache settings
+        <<: *global_cache
+    before_script:
+        - !reference [.update_apt_system, script]
+        - !reference [.install_php_program, script]
+        - !reference [.install_php_extensions, script]
+        - !reference [.install_php_composer, script]
+        - !reference [.configure_php_composer_dependencies, script]
+        - !reference [.configure_env_dotfile, script]
+    script:
+        - echo "[+] Create PHP technical documentation"
+        - php composer.phar run-script docs:make
+    artifacts:
+        expose_as: "PHP docs job"
+        paths: ["docs/.build/", ".env"]
 
 # disable package creation task
 create:package:
-  needs:
-    - job: test:php
-      optional: true
-  rules:
-    - if: ($CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH || $CI_COMMIT_BRANCH == $DEVELOP_BRANCH) && ($CI_PIPELINE_SOURCE == "push") # Only run on merge request
-      exists: # Avoid error on unconfigured projects
-        - .root/DEBIAN/control
-        - DebianPackageStructure.yaml
-      when: manual
-      allow_failure: true
-    - if: $CI_COMMIT_BRANCH # Enable anyone to get deb package manually
-      exists: # Avoid error on unconfigured projects
-        - .root/DEBIAN/control
-        - DebianPackageStructure.yaml
-      when: manual
-      allow_failure: true
+    needs:
+        - job: test:php
+          optional: true
+    rules:
+        - if: ($CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH || $CI_COMMIT_BRANCH == $DEVELOP_BRANCH) && ($CI_PIPELINE_SOURCE == "push") # Only run on merge request
+          exists: # Avoid error on unconfigured projects
+              - .root/DEBIAN/control
+              - DebianPackageStructure.yaml
+          when: manual
+          allow_failure: true
+        - if: $CI_COMMIT_BRANCH # Enable anyone to get deb package manually
+          exists: # Avoid error on unconfigured projects
+              - .root/DEBIAN/control
+              - DebianPackageStructure.yaml
+          when: manual
+          allow_failure: true
 
 # disable publish develop task
 publish:develop:
-  stage: publish
-  rules:
-    - when: never
+    stage: publish
+    rules:
+        - when: never
 
 # disable publish master task
 publish:master:
-  stage: publish
-  rules:
-    - when: never
+    stage: publish
+    rules:
+        - when: never
 
 # publish application source code to testing environment
 deploy_testing:
-  stage: deploy
-  extends:
-    - .deploy_application
-  rules:
-    - if: ($CI_PIPELINE_SOURCE == "push") && ($CI_COMMIT_BRANCH == $DEVELOP_BRANCH) # Only run on merge accepted
-      when: on_success
-  environment:
-    name: testing
+    stage: deploy
+    extends:
+        - .deploy_application
+    rules:
+        - if: ($CI_PIPELINE_SOURCE == "push") && ($CI_COMMIT_BRANCH == $DEVELOP_BRANCH) # Only run on merge accepted
+          when: on_success
+    environment:
+        name: testing
 
 # publish application source code to production environment
 deploy_production:
-  stage: deploy
-  extends:
-    - .deploy_application
-  rules:
-    - if: ($CI_PIPELINE_SOURCE == "push") && ($CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH) # Only run on merge accepted
-      when: manual
-  environment:
-    name: production
+    stage: deploy
+    extends:
+        - .deploy_application
+    rules:
+        - if: ($CI_PIPELINE_SOURCE == "push") && ($CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH) # Only run on merge accepted
+          when: manual
+    environment:
+        name: production
 
 # disable node test task
 test:node:
-  stage: test
-  rules:
-    - when: never
+    stage: test
+    rules:
+        - when: never
 
 # disable node doc task
 doc:node:
-  rules:
-    - when: never
+    rules:
+        - when: never
 
 # disable build cpp task
 build:cpp:
-  stage: build
-  rules:
-    - when: never
+    stage: build
+    rules:
+        - when: never
 
 # disable test cpp task
 test:cpp:
-  stage: test
-  rules:
-    - when: never
+    stage: test
+    rules:
+        - when: never
 
 # disable doc cpp task
 doc:cpp:
-  stage: test
-  rules:
-    - when: never
+    stage: test
+    rules:
+        - when: never
 
 # disable doc cpp task
 create:make:package:
-  stage: deploy
-  rules:
-    - when: never
+    stage: deploy
+    rules:
+        - when: never
