@@ -28,6 +28,8 @@ class ArticleController extends Controller
         }
 
         $locales = Feed::select('locale')->where('locale', '!=', "")->distinct()->get();
-        return view('search', compact('articles', 'icon_feeds', 'locales'));
+        $per_page = [20, 75, 100, 200];
+
+        return view('search', compact('articles', 'icon_feeds', 'locales', 'per_page'));
     }
 }

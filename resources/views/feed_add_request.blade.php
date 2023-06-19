@@ -43,16 +43,17 @@
                 type: "POST",
                 data: {
                     name: $('#name').val(),
-                    link: $('#link').val()
+                    link: $('#link').val(),
+                    author_logo: $("#author_logo").val()
                 },
                 error: function(err) {
                     hideLoadingScreen();
-                    showErrorNotification(err.responseJSON);
+                    showNotification(err.responseJSON, "error");
                 },
                 success: function() {
                     hideLoadingScreen();
                     window.location.replace('/sources');
-                    showSuccessNotification("Flux ajouté avec succès !");
+                    showNotification("Flux ajouté avec succès !", "success");
                 }
             });
         }

@@ -22,7 +22,7 @@ use Illuminate\View\View;
 |
 */
 
-Route::get('/', [ArticleController::class, 'fetchLatest'])->name("articles.fetch")->name('home');
+Route::get('/', [ArticleController::class, 'fetchLatest'])->name("home");
 
 Route::get("/sources", [SearchController::class, 'search'])->name("sources");
 

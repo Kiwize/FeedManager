@@ -23,8 +23,8 @@ class Validations
 
     public static function feedSearchValidation(Request $request): JsonResponse {
         $validator = Validator::make($request->all(), [
-            'nameFilter' => 'regex:/^[a-bA-B0-9 ]+$/',
-            'localeFilter' => 'max:2|string'
+            'nameFilter' => 'max:64',
+            'localeFilter' => 'max:2'
         ]);
 
         if($validator->fails()) {

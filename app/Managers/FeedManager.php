@@ -5,6 +5,8 @@ namespace App\Managers;
 use App\Models\Article;
 use App\Models\Feed;
 use ErrorException;
+use Illuminate\Support\Facades\Log;
+use UnexpectedValueException;
 
 class FeedManager
 {
@@ -59,7 +61,8 @@ class FeedManager
             $addedArticlesLocale = Article::where('feed_id', '=', $newFeed->id)->select('locale')->get()->first();
             $newFeed->locale = is_null($addedArticlesLocale) ? "" : $addedArticlesLocale->locale;
             $newFeed->save();
-        } catch (ErrorException $ex) {
+        } catch(UnexpectedValueException $uve) {
+            Log::error("Unable to store feed " . $name . " at " . $link . " ,due to : " . $uve);
             return false;
         }
 
