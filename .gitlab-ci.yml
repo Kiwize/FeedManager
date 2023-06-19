@@ -47,7 +47,7 @@ cache: &global_cache
     - pear config-set php_ini /etc/php/${PHP_VERSION}/cli/php.ini
     - echo "[+] Update php code coverage extension"
     - pecl install pcov
-    - pecl install mcrypt-1.0.3
+    - pecl install mcrypt
 
 .install_php_composer:
   script:
