@@ -3,16 +3,16 @@
 ---
 
 - Created at: 2023/05/05
-- Updated at: 2023/05/05
+- Updated at: 2023/06/19
 - Version: 0.1
-- Author: Bertrand SOURIAU (bsu@prohacktive.io), Alexandre ANDRÉ (a.andre@prohacktive.io)
+- Author: Thomas PRADEAU (pradeau.thomas0@gmail.com), Alexandre ANDRÉ (a.andre@prohacktive.io)
 - Client: Prohacktive (https://prohacktive.io)
 - Project URL:
   - development: http://localhost:8700
   - phpmyadmin: http://localhost:8780/
-- Development PHP: >=7.3.30
+- Development PHP: >=8.1
 - Project dependencies:
-  - composer: >=2.0.9
+  - composer: >=2.2.4
 
 ## Main Goal
 

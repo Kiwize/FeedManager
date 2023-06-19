@@ -1,0 +1,98 @@
+#!/bin/bash
+
+if test -t 1; then # if terminal
+    ncolors=$(which tput > /dev/null && tput colors) # supports color
+    if test -n "$ncolors" && test $ncolors -ge 8; then
+        termcols=$(tput cols)
+        bold="$(tput bold)"
+        underline="$(tput smul)"
+        standout="$(tput smso)"
+        normal="$(tput sgr0)"
+        black="$(tput setaf 0)"
+        red="$(tput setaf 1)"
+        green="$(tput setaf 2)"
+        yellow="$(tput setaf 3)"
+        blue="$(tput setaf 4)"
+        magenta="$(tput setaf 5)"
+        cyan="$(tput setaf 6)"
+        white="$(tput setaf 7)"
+    fi
+fi
+
+print_status() {
+    echo
+    echo "${cyan}## $1${normal}"
+    echo
+}
+
+stop_service() {
+	service_available=$(systemctl list-unit-files | grep $1 | wc -l)
+	if [ "$service_available" -eq "1" ]; then
+		print_status "Stopping $1"
+		exec_cmd "service  $1 stop"
+	fi
+}
+
+start_service() {
+	service_available=$(systemctl list-unit-files | grep $1 | wc -l)
+	if [ "$service_available" -eq "1" ]; then
+		print_status "Starting $1"
+		exec_cmd "service  $1 start"
+	fi
+}
+
+print_status "[+] script postinst $0 started"
+
+PHP_VERSION="8.1"
+
+# stop nginx service
+stop_service nginx
+
+# set lord.prohacktive as owner of /var/www/news-feed-api directory
+chown -R lord.lord /var/www/news-feed-api
+
+# install composer dependencies
+# if [[ -f /var/www/news-feed-api/composer-vendor.tar.gz ]]; then
+#   print_status "[+] Extract composer dependencies into vendor directory"
+#   tar -xzf /var/www/news-feed-api/composer-vendor.tar.gz -C /var/www/news-feed-api/
+#   chown -R lord.www-data /var/www/news-feed-api/vendor
+# fi
+
+# flag to detect if database is already exists or not
+# FIRST_INSTALLATION=false
+
+# create a sqlite database
+# if [[ ! -f /var/prohacktive/news-feed-api/database12282020.sqlite ]]; then
+#   FIRST_INSTALLATION=true
+#   print_status "[+] First intallation discovered"
+# fi
+
+# run database migration installer
+# if $FIRST_INSTALLATION; then
+#   print_status "[+] Run database migration installer"
+#   npm --prefix /var/www/news-feed-api/ run migration:installer
+# fi
+
+# print_status "[+] Run database migration updater"
+# npm --prefix /var/www/news-feed-api/ run migration:updater
+
+# create nginx symlink
+print_status "[+] Create nginx prohacktive-news-feed-api.conf symlink"
+ln -sf /etc/nginx/sites-available/prohacktive-news-feed-api.conf /etc/nginx/sites-enabled/prohacktive-news-feed-api.conf
+
+# create php${PHP_VERSION} fpm custom php configuration symlink
+print_status "[+] Create php ${PHP_VERSION} prohacktive-news-feed-api.ini fpm symlink"
+ln -sf /etc/prohacktive/php/${PHP_VERSION}/conf.d/10-prohacktive-news-feed-api.ini /etc/php/${PHP_VERSION}/fpm/conf.d
+
+# create php${PHP_VERSION} fpm custom php configuration symlink
+print_status "[+] Create php ${PHP_VERSION} prohacktive-news-feed-api.ini cli symlink"
+ln -sf /etc/prohacktive/php/${PHP_VERSION}/conf.d/10-prohacktive-news-feed-api.ini /etc/php/${PHP_VERSION}/cli/conf.d
+
+# restart php${PHP_VERSION}-fpm.service
+print_status "[+] Restart service php${PHP_VERSION}-fpm.service"
+systemctl restart php${PHP_VERSION}-fpm.service
+
+# restart nginx service
+start_service nginx
+
+print_status "[+] script postinst $0 completed"

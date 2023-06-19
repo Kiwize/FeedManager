@@ -1,0 +1,90 @@
+#!/bin/bash
+
+if test -t 1; then # if terminal
+    ncolors=$(which tput > /dev/null && tput colors) # supports color
+    if test -n "$ncolors" && test $ncolors -ge 8; then
+        termcols=$(tput cols)
+        bold="$(tput bold)"
+        underline="$(tput smul)"
+        standout="$(tput smso)"
+        normal="$(tput sgr0)"
+        black="$(tput setaf 0)"
+        red="$(tput setaf 1)"
+        green="$(tput setaf 2)"
+        yellow="$(tput setaf 3)"
+        blue="$(tput setaf 4)"
+        magenta="$(tput setaf 5)"
+        cyan="$(tput setaf 6)"
+        white="$(tput setaf 7)"
+    fi
+fi
+
+print_status() {
+    echo
+    echo "${cyan}## $1${normal}"
+    echo
+}
+
+cyan() {
+    echo -e "${cyan}$1${normal}"
+}
+
+red() {
+    echo "${red}$1${normal}"
+}
+
+bail() {
+    echo 'Error executing command, exiting'
+    exit 1
+}
+
+exec_cmd_nobail() {
+    # echo "+ $1"
+    bash -c "$1"
+}
+
+exec_cmd() {
+    exec_cmd_nobail "$1" || bail
+}
+
+stop_service() {
+	service_available=$(systemctl list-unit-files | grep $1 | wc -l)
+	if [ "$service_available" -eq "1" ]; then
+		print_status "Stopping $1"
+		exec_cmd "service  $1 stop"
+	fi
+}
+
+start_service() {
+	service_available=$(systemctl list-unit-files | grep $1 | wc -l)
+	if [ "$service_available" -eq "1" ]; then
+		print_status "Starting $1"
+		exec_cmd "service  $1 start"
+	fi
+}
+
+print_status "[+] script prerm $0"
+
+PHP_VERSION="8.1"
+
+# stop nginx service
+stop_service nginx
+
+# remove vendor directory
+if [[ -d /var/www/news-feed-api/vendor ]]; then
+  print_status "[+] Remove composer vendor directory"
+  rm -fr /var/www/news-feed-api/vendor
+fi
+
+# remove nginx symlink
+if [[ -f /etc/nginx/sites-enabled/prohacktive-news-feed-api.conf ]]; then
+  echo "[+] Remove sites enabled prohacktive news feed api conf"
+  rm -f /etc/nginx/sites-enabled/prohacktive-news-feed-api.conf
+fi
+
+# restart php${PHP_VERSION}-fpm.service
+print_status "[+] Restart service php${PHP_VERSION}-fpm.service"
+systemctl restart php${PHP_VERSION}-fpm.service
+
+# restart nginx service
+start_service nginx

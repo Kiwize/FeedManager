@@ -22,3 +22,4 @@ DebianPackageStructure.yaml
 package.dist.json
 phpdoc.dist.yml
 phpDocumentor.phar
+.history

@@ -1,0 +1,55 @@
+package:
+  # yaml package version
+  version: 0.1.0
+
+  # directory to push the contents of the package
+  output_directory: /var/www/news-feed-api
+
+  # do you want to create the empty directories in the package
+  create_directory: true
+
+  # actions on package paths
+  paths:
+    to_copy:
+      - .root/DEBIAN /
+
+    to_move:
+      - .root/etc/nginx/sites-available/prohacktive-news-feed-api.conf /etc/nginx/sites-available
+      - .root/etc/prohacktive/php/8.1/conf.d/10-prohacktive-news-feed-api.ini /etc/prohacktive/php/8.1/conf.d
+
+    to_delete:
+      - .git
+      - .gitignore
+      - .vscode
+      - .example.auth.json
+      - .env
+      - .phpunit.result.cache
+      - .dockerignore
+      - .gitlab-ci.yml
+      - .php.dependencies.phk
+      - .phpdoc
+      - .styleci.yml
+      - README.md
+      - ROADMAP.md
+      - MIGRATION.md
+      - ABILITIES.md
+      - CHANGELOG.md
+      - notes.md
+      - LICENSE
+      - auth.json
+      - docker-composer.yml
+      - phpcs.xml
+      - phpdoc.dist.xml
+      - phpDocumentor.phar
+      - composer.phar
+      - composer.json
+      - composer.lock
+      - composer-vendor.dev.tar.gz
+      - vendor
+      - docs
+      - docker
+      - bootstrap/cache
+      - storage/logs
+      - storage/framework
+      - public/storage
+      - node_modules
