@@ -14,7 +14,14 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class ArticleController extends Controller
-{
+{    
+    /**
+     * fetchLatest
+     * Récupères les articles les plus récents en respectants les critères de recherche par nom et langue.
+     * @param  Request $request
+     * @return View Compilée avec les résultats de recherche
+     * @method GET / string localeFilter, int resultsPerPage
+     */
     public function fetchLatest(Request $request): View|JsonResponse
     {
         $validator = Validations::articlesFetchValidation($request);
@@ -22,15 +29,15 @@ class ArticleController extends Controller
             return $validator;
         }
 
-        $icon_feeds = [];
+        $iconFeeds = [];
         $articles = Article::orderBy('pubdate', 'DESC')->where('locale', 'like', "%" . $request->localeFilter . "%")->paginate($request->resultsPerPage);
         foreach(Feed::all('id', 'author_logo') as $feed) {
-            $icon_feeds[$feed->id] = $feed->author_logo;
+            $iconFeeds[$feed->id] = $feed->author_logo;
         }
 
         $locales = Feed::select('locale')->where('locale', '!=', "")->distinct()->get();
-        $per_page = [20, 75, 100, 200];
+        $perPage = [20, 75, 100, 200];
 
-        return view('articlemanager', compact('articles', 'icon_feeds', 'locales', 'per_page'));
+        return view('articlemanager', compact('articles', 'iconFeeds', 'locales', 'perPage'));
     }
 }
