@@ -156,7 +156,7 @@ class ArticleManager
                     "value" => $article->description
                 ],
                 "authors" => ["name" => $feed->link],
-                "author" => $feed->link, //TODO Logo de l'auteur / flux
+                "author" => $feed->author_logo,
                 "author_detail" => [
                     "name" => $feed->link,
                     "id" => $feed->id,
