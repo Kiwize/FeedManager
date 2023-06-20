@@ -33,7 +33,6 @@ class FeedUpdater
             try {
                 $rssData = new RSSData($feed->link);
             } catch (ErrorException $ex) {
-                echo ($ex);
                 continue;
             }
 

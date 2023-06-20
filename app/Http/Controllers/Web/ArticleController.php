@@ -22,6 +22,7 @@ class ArticleController extends Controller
             return $validator;
         }
 
+        $icon_feeds = [];
         $articles = Article::orderBy('pubdate', 'DESC')->where('locale', 'like', "%" . $request->localeFilter . "%")->paginate($request->resultsPerPage);
         foreach(Feed::all('id', 'author_logo') as $feed) {
             $icon_feeds[$feed->id] = $feed->author_logo;
@@ -30,6 +31,6 @@ class ArticleController extends Controller
         $locales = Feed::select('locale')->where('locale', '!=', "")->distinct()->get();
         $per_page = [20, 75, 100, 200];
 
-        return view('search', compact('articles', 'icon_feeds', 'locales', 'per_page'));
+        return view('articlemanager', compact('articles', 'icon_feeds', 'locales', 'per_page'));
     }
 }

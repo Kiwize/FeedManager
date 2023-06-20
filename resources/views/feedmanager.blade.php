@@ -25,8 +25,10 @@ use App\Http\Controllers\FeedsController;
         <div class="rounded-pill p-2 d-flex flex-row justify-content-center buttons-container mt-sm-2">
             <button id="add_button" class="btn btn-primary" onclick="window.location.replace('/feed_add_request');">Ajouter</button>
         </div>
-
     </div>
+    @if(count($feeds) === 0)
+    <h3 class="h3 text-center mt-3">Il n'y a rien à afficher pour le moment...</h3>
+    @else
     <div class="">
         {{ csrf_field() }}
         <div class="input-group d-flex flex-row justify-content-lg-around mt-lg-4">
@@ -99,6 +101,7 @@ use App\Http\Controllers\FeedsController;
             </tbody>
         </table>
     </div>
+    @endif
 </body>
 
 </html>

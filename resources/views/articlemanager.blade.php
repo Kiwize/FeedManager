@@ -7,7 +7,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">z
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -18,7 +18,11 @@
     <script type="text/javascript" src="<?php echo "js/articleManager.js" ?>"></script>
     @include('header')
     <div id="content">
-        <h2 class="h2 text-center mt-3">Les dernières parutions</h2>
+        <h2 class="h2 text-center mt-3 mb-2">Les dernières parutions</h2>
+        @if(count($articles) === 0)
+        <h3 class="h3 text-center mt-3">Il n'y a rien à afficher pour le moment...</h3>
+        @else
+
         <div class="input-group d-flex flex-row justify-content-lg-around mt-lg-4">
             <div class="form-inline">
                 <form action="{{ route('home') }}" method="get" class="d-flex flex-row justify-content-center">
@@ -72,6 +76,7 @@
         <div class="text-center d-flex flex-row justify-content-center mx-auto mt-3 mb-4 pb-2 pt-2 w-50">
             {!! $articles->appends(request()->query())->links() !!}
         </div>
+        @endif
     </div>
 </body>
 
