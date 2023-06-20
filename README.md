@@ -3,8 +3,8 @@
 ---
 
 - Created at: 2023/05/05
-- Updated at: 2023/06/19
-- Version: 0.1
+- Updated at: 2023/06/20
+- Version: 0.1.0
 - Author: Thomas PRADEAU (pradeau.thomas0@gmail.com), Alexandre ANDRÉ (a.andre@prohacktive.io)
 - Client: Prohacktive (https://prohacktive.io)
 - Project URL:
