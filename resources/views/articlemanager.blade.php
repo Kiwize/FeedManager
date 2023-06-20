@@ -39,7 +39,7 @@
                     <label class=" form-label lead">Résultats par page : </label>
                     <div class=" form-group mx-2">
                         <select class=" selector form-control" name="resultsPerPage" onchange="this.form.submit()">
-                            @foreach($per_page as $val)
+                            @foreach($perPage as $val)
                             <option value="{{$val}}" {{request('resultsPerPage') == $val ? 'selected' : '' }}>{{$val}}</option>
                             @endforeach
                         </select>
@@ -66,7 +66,7 @@
                             <td class="lead">{{ $article->title}}</td>
                             <td class="lead text-center">{{ strtoupper($article->locale) }}</td>
                             <td>{{ $article->pubdate}}</td>
-                            <td><img class="author_logo" src="{{$icon_feeds[$article->feed_id]}}"></td>
+                            <td><img class="author_logo" src="{{$iconFeeds[$article->feed_id]}}"></td>
                         </tr>
                         @endforeach
                     </tbody>
