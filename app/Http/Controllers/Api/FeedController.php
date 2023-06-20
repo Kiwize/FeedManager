@@ -107,7 +107,7 @@ class FeedController extends Controller
         if (!FeedManager::exists($request->link)) {
             $created_content = FeedManager::storeFeedAndAddArticles($request->name, $request->link, $request->author_logo);
 
-            if($created_content === false) {
+            if ($created_content === false) {
                 DB::rollBack();
                 return response()->json(['error' => 'Internal server error'], Response::HTTP_INTERNAL_SERVER_ERROR);
             }

@@ -6,6 +6,7 @@ require_once 'Text/LanguageDetect.php';
 
 use ErrorException;
 use Exception;
+use Illuminate\Support\Facades\Log;
 use SimpleXMLElement;
 use Text_LanguageDetect;
 use UnexpectedValueException;
@@ -28,10 +29,9 @@ class RSSData
         if (filter_var($url, FILTER_VALIDATE_URL) === false)
             throw new UnexpectedValueException("Invalid URL");
 
-        
         $this->url = $url;
         $this->dataType = $this->parse($url);
-        if($this->dataType === "unknown")
+        if ($this->dataType === "unknown")
             throw new UnexpectedValueException("Invalid data format !");
     }
 
@@ -49,13 +49,14 @@ class RSSData
             return $this->data->items[$id];
         }
     }
-    
+
     /**
      * getLocale
      *
      * @return string Renvoie la langue du flux au format ISO 639-1, soit un code à deux lettres (fr, en, de...).
      */
-    public function getLocale(): string {
+    public function getLocale(): string
+    {
         $sampleTest = $this->getDescription(0);
         $ld = new Text_LanguageDetect();
         $ld->setNameMode(2);
@@ -155,16 +156,20 @@ class RSSData
             $this->articleCount = count($this->data->channel->item);
             return "xml";
         } catch (Exception $ex) {
-            // Log::warning('XML Feed parsing error !' . $ex);
+            Log::warning('XML Feed parsing error !' . $ex);
         }
 
-        if(is_null(json_decode(file_get_contents($url, false))) === false) {
-            $this->data = json_decode(file_get_contents($url, false));
-            $this->articleCount = count($this->data->items);
-            return "json";
+        try {
+            if (is_null(json_decode(file_get_contents($url, false))) === false) {
+                $this->data = json_decode(file_get_contents($url, false));
+                $this->articleCount = count($this->data->items);
+                return "json";
+            }
+        } catch (ErrorException $ex) {
+            Log::error(("Feed resolution error : " . $ex));
         }
 
-        return 'unknown';        
+        return 'unknown';
     }
 
     public function getType(): string

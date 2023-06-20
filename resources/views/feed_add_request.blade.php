@@ -29,7 +29,7 @@
                     <input type="text" id="author_logo" name="author_logo" class="form-control" required>
                 </div>
                 <div class="mt-3">
-                    <button class="btn btn-danger" onclick="history.back()">Annuler</button>
+                    <button class="btn btn-danger" onclick="window.location.replace('/sources');">Annuler</button>
                     <button id="submit_button" onclick="submitForm();" class="btn btn-primary">Ajouter</button>
                 </div>
             </div>
@@ -43,16 +43,17 @@
                 type: "POST",
                 data: {
                     name: $('#name').val(),
-                    link: $('#link').val()
+                    link: $('#link').val(),
+                    author_logo: $("#author_logo").val()
                 },
                 error: function(err) {
                     hideLoadingScreen();
-                    showErrorNotification(err.responseJSON);
+                    showNotification(err.responseJSON, "error");
                 },
                 success: function() {
                     hideLoadingScreen();
-                    window.location.replace('/manager');
-                    showSuccessNotification("Flux ajouté avec succès !");
+                    window.location.replace('/sources');
+                    showNotification("Flux ajouté avec succès !", "success");
                 }
             });
         }

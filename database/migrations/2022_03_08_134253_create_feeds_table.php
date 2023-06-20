@@ -18,7 +18,6 @@ class CreateFeedsTable extends Migration
             $table->string('name', 50);
             $table->string('link', 150);
             $table->timestamps();
-            $table->timestamp('published_at')->nullable();
         });
     }
 

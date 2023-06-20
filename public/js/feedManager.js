@@ -17,11 +17,11 @@ function deleteFeed(_id, _name) {
       success: function () {
         hideLoadingScreen();
         location.reload();
-        showSuccessNotification("Flux supprimé avec succès !");
+        showNotification("Flux supprimé avec succès !", "success");
       },
       error: function (xhr) {
         hideLoadingScreen();
-        showErrorNotification(xhr.responseJSON);
+        showNotification(xhr.responseJSON, "error");
       },
     });
   });

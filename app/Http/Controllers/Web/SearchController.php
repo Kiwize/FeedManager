@@ -29,6 +29,6 @@ class SearchController extends Controller
         $feeds = Feed::where('name', 'like', '%' . $request->nameFilter . '%')->where('locale', 'like', '%' . $request->localeFilter . '%')->paginate(Config::RESULTS_PER_PAGES);
         $locales = Feed::select('locale')->where('locale', '!=', "")->distinct()->get();
     
-        return view('manager', compact('locales', 'feeds'));
+        return view('feedmanager', compact('locales', 'feeds'));
     }
 }

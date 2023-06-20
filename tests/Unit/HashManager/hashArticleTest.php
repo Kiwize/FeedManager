@@ -1,13 +1,15 @@
 <?php
 
 namespace App\Managers;
-use PHPUnit\Framework\TestCase;
 
+use Tests\CreatesApplication;
+use Tests\TestCase;
 use function PHPUnit\Framework\assertCount;
 use function PHPUnit\Framework\assertEmpty;
 use function PHPUnit\Framework\assertIsArray;
 use function PHPUnit\Framework\assertIsString;
 use function PHPUnit\Framework\assertNull;
+
 
 class hashArticleTest extends TestCase{
 

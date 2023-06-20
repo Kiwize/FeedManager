@@ -22,12 +22,12 @@ use Illuminate\View\View;
 |
 */
 
-Route::get('/', [ArticleController::class, 'fetchLatest'])->name("articles.fetch");
+Route::get('/', [ArticleController::class, 'fetchLatest'])->name("home");
 
-Route::get("/manager", [SearchController::class, 'search'])->name("feeds.search");
+Route::get("/sources", [SearchController::class, 'search'])->name("sources");
 
-Route::get("/add", function () {
-    return view('add');
+Route::get("/feed_add_request", function () {
+    return view('feed_add_request');
 });
 
 
