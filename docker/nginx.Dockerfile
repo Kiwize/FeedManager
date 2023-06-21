@@ -10,7 +10,3 @@ RUN sed -i '/stretch-updates/d' /etc/apt/sources.list
 
 # Install dependencies
 RUN apt-get update && apt-get install -y curl && apt-get clean
-
-# Setup Docker healthcheck
-# Documentation: https://docs.docker.com/engine/reference/builder/#healthcheck
-HEALTHCHECK --interval=10s --timeout=30s --retries=3 CMD curl --fail http://localhost:80/ping || exit 1
