@@ -43,6 +43,10 @@ up: ## 🚀  Start docker containers
 stop: ## 🥅  Stop docker containers
 	@echo "Stop docker containers"
 	@docker-compose stop
+
+.PHONY: down
+down: ## Remove docker containers
+	@echo "Remove docker containers"
 	@docker-compose down
 
 .PHONY: ps
