@@ -39,6 +39,8 @@ class FeedControllerTest extends TestCase {
         $response = $this->delete("/api/feeds/delete", []);
         $response->assertStatus(400);
 
+        Feed::create(['name' => 'unit_test_feed', 'link' => 'https://inessential.com/feed.json', 'locale' => 'en']);
+
         $response = $this->delete("/api/feeds/delete", [
             'feedID' => Feed::first()->id
         ]);

@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Feed extends Model
 {
     protected $table = 'feeds';
+
+    protected $fillable = ['name', 'link', 'locale'];
     
     /**
      * articles
