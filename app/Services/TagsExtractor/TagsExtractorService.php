@@ -41,14 +41,19 @@ class TagsExtractorService
 
     /**
      * deleteSmallWordsFromArray
+     * Can specify the min length and if we want to keep numeric
      *
      * @param  array $wordList
      * @param  int $minLength
+     * @param  true $keepNumber
      * @return array
      */
-    public function deleteSmallWordsFromArray(array $wordList, int $minLength = 2): array
+    public function deleteSmallWordsFromArray(array $wordList, int $minLength = 2, $keepNumber = false): array
     {
         foreach ($wordList as $key => $word) {
+            if ($keepNumber &&  \is_numeric($word)) {
+                continue;
+            }
             $strWord = strval($word);
             if (strlen($strWord) <= $minLength) {
                 unset($wordList[$key]); // Remove words with length less than $minLength
@@ -88,11 +93,7 @@ class TagsExtractorService
     public function extractExtraWords(string $text): array
     {
         $response = [];
-        try {
-            $keywords = TagsExtractorConstants::$keywords ?? [];
-        } catch (Exception $e) {
-            throw new Exception('Error when extracting keywords : ' . $e->getMessage());
-        }
+        $keywords = TagsExtractorConstants::$keywords ?? [];
 
         $pattern = '/\b(' . implode('|', array_map('preg_quote', $keywords)) . ')\b/i'; // Expression régulière dynamique
 

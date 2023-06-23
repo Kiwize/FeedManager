@@ -1,0 +1,10 @@
+Package: prohacktive-news-feed-api
+Version: 0.1.0
+Essential: no
+Section: main
+Priority: optional
+Architecture: all
+Architectures: i386 amd64 arm64 armhf
+Depends: nginx, nginx-extras, php-fpm, php-zmq, php-zip, php-gd, php-mbstring, php-xml, php-curl, php-gmp, php-zip, php-mysql, php-sqlite, sqlite3
+Maintainer: bsu@prohacktive.io
+Description: ProHacktive News Feed Api.
