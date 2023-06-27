@@ -54,6 +54,7 @@ class ArticleManager
      */
     public static function createAllArticlesArray(array $rssDataURLs): bool
     {
+        // Ce n est pas une bonne idée de créer une méthode pour les tests unitaires ou les seeds (je n avais pas vu avant ^^)
         foreach ($rssDataURLs as $url) {
             try {
                 $testRSSData = new RSSData($url);
