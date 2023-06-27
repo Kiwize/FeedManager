@@ -14,7 +14,7 @@ class AddFeedLocale extends Migration
     public function up()
     {
         Schema::table('feeds', function(Blueprint $table) {
-            $table->char('locale', 2)->nullable();
+            $table->char('locale', 2)->default('fr');
         });
     }
 
